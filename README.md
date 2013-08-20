@@ -10,8 +10,8 @@ that oscillates around you according to deterministic rules.
 Technologies
 ============
 
-*JavaScript
-*CSS
+* JavaScript
+* CSS
 
 TODO
 ====
