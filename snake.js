@@ -67,11 +67,24 @@ var Snakes = (function(){
     this.life = new Life(this)
   }
 
+  Game.prototype.toggleLiving = function(event){
+    $(event.target).toggleClass("living");
+    var idY = parseInt($(event.target).attr("id").split("-")[1]);
+    var idX = parseInt($(event.target).attr("id").split("-")[3]);
+    console.log([idY, idX])
+    if (game.life.has([idY, idX])){
+      game.life.list.splice(game.life.list.indexOf([idY, idX]), 1);
+    } else {
+      game.life.list.push([idY, idX]);
+    }
+  }
+
   Game.prototype.addApple = function() {
     var randY = Math.floor(Math.random()*this.yDim),
         randX = Math.floor(Math.random()*this.xDim)
     
-    while(this.snake.has([randY,randX]) || this.life.has([randY, randX])){
+    while((this.apple[0] == randY && this.apple[1] == randX)||
+           this.snake.has([randY,randX]) || this.life.has([randY, randX])){
       randY = Math.floor(Math.random()*this.yDim)
       randX = Math.floor(Math.random()*this.xDim)
     }
@@ -323,17 +336,34 @@ $(document).ready(function(){
     }
   }
 
-  $("li").on("click", function(){
-    $(this).toggleClass("living");
-    var idY = parseInt($(this).attr("id").split("-")[1]);
-    var idX = parseInt($(this).attr("id").split("-")[3]);
-    console.log([idY, idX])
-    if (game.life.has([idY, idX])){
-      game.life.list.splice(game.life.list.indexOf([idY, idX]), 1);
-    } else {
-      game.life.list.push([idY, idX]);
+  $("html").on("mousedown", function(){
+    if (event.target.tagName == "LI"){
+      game.toggleLiving(event);
     }
+    $("li").on("mouseenter", game.toggleLiving);
+    $("html").on("mouseup", function(){
+      $("li").off("mouseenter");
+    })
   })
 
   game.start()
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
