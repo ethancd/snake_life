@@ -40,12 +40,12 @@ li.snake {
   background-color: #004d00;
 }
 
-li.living {
-  background-color: #f00;
-  box-shadow: 0px 0px 80px #f00;
-}
-
 li.apple {
   background-color: #fff;
   border-radius: 20px;
+}
+
+li.living {
+  background-color: #f00;
+  box-shadow: 0px 0px 80px #f00;
 }
