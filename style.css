@@ -36,7 +36,7 @@ li {
   opacity: 0.0;
 }
 
-li.snake, li.apple, li.living {
+li.snake, li.apple, li.living, li.water {
   opacity: 1.0;
 }
 
@@ -54,4 +54,8 @@ li.apple {
 li.living {
   background-color: #f00;
   box-shadow: 0px 0px 80px #f00;
+}
+
+li.water {
+  background-color: #00f;
 }
