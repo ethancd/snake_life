@@ -1,4 +1,5 @@
 var Snakes = (function(){
+
   turnCount = 0;
   scoreCount = 0;
   appleCount = -1;
@@ -56,6 +57,7 @@ var Snakes = (function(){
 
     var body = []
     var startY = Math.floor(3 * yDim/4), startX = Math.floor(xDim/2)
+
     body.push([startY, startX]) 
     for (var i = 1; i < length; i++) {
       body.push([startY, startX-i])
@@ -169,6 +171,7 @@ Game.prototype.render = function(){
 
   Game.prototype.start = function(){
     var that = this;
+
     handler = setInterval(function(){
       that.update();
       that.render();
@@ -210,7 +213,6 @@ Game.prototype.render = function(){
   Life.prototype.update = function(game) {
     this.list = this.detectionSweep(game)
     potentialScore = (10 + appleCount) * ($(".living").length - 16)
-    console.log(this.list)
   };
 
   Life.prototype.mutate = function(game) {
