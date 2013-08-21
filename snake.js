@@ -1,9 +1,9 @@
 var Snakes = (function(){
-
   turnCount = 0;
   scoreCount = 0;
   appleCount = -1;
   potentialScore = 0;
+  speedConstant = 1;
   topLeft = [];
   bottomLeft = [];
   topRight = [];
@@ -53,7 +53,8 @@ var Snakes = (function(){
     this.yDim = yDim;
     this.time = time;
     this.delay = length + 1;
-    this.apple = [yDim * 2, xDim * 2]
+    this.apple = [yDim * 2, xDim * 2];
+    speedConstant = Math.pow((250 / this.time), 1.5);
 
     var body = []
     var startY = Math.floor(3 * yDim/4), startX = Math.floor(xDim/2)
@@ -143,6 +144,7 @@ var Snakes = (function(){
 Game.prototype.render = function(){
   $(".score").html(" " + scoreCount);
   $(".potential").html(" + " + potentialScore)
+  var glow = ($(".living").length - 16) * 100;
   for (var i = 0; i < this.yDim; i++) {
     for (var j = 0; j < this.xDim; j++) {
       if (this.snake.has([i,j])){
@@ -225,21 +227,8 @@ Game.prototype.render = function(){
 
   Life.prototype.update = function(game) {
     this.list = this.detectionSweep(game)
-    potentialScore = (10 + appleCount) * ($(".living").length - 16)
+    potentialScore = Math.floor((10 + appleCount) * ($(".living").length - 16) * speedConstant)
   };
-
-  Life.prototype.mutate = function(game) {
-    var randY = Math.floor(Math.random()*game.yDim),
-        randX = Math.floor(Math.random()*game.xDim)
-    
-    while(game.snake.has([randY,randX])){
-      randY = Math.floor(Math.random()*game.yDim)
-      randX = Math.floor(Math.random()*game.xDim)
-    }
-
-    this.list.push([randY, randX])
-  };
-
 
   Life.prototype.detectionSweep = function(game) {
     var tempList = []
@@ -325,7 +314,7 @@ $('html').on("keydown", function (event) {
 XDIM = 20
 YDIM = 20
 
-game = new Snakes.Game(XDIM, YDIM, 6, 180)
+game = new Snakes.Game(XDIM, YDIM, 6, 100)
 
 $(document).ready(function(){
   $("ul").css({"width": XDIM*30 +"px", "height": YDIM*30 + "px"} )

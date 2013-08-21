@@ -45,8 +45,10 @@ li.snake {
 }
 
 li.apple {
-  background-color: #fff;
-  border-radius: 20px;
+  background: url("apple.png");
+  background-position: 2px 0px;
+  background-size: auto 30px;
+  background-repeat: no-repeat;
 }
 
 li.living {
