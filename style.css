@@ -32,8 +32,12 @@ li {
   display: block;
   width: 30px;
   height: 30px;
-  background-color: #000;
   border-radius: 5px;
+  opacity: 0.0;
+}
+
+li.snake, li.apple, li.living {
+  opacity: 1.0;
 }
 
 li.snake {
