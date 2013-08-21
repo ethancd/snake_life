@@ -4,8 +4,8 @@ Snake/Life
 What does an iconic mobile video game have in common with a cellular automaton generator? This project. 
 (Also they both originated in the 70's!)
 
-Using the arrow keys, direct your Snake to eat fruit and grow ever longer, while also avoiding the raging fire of Life
-that oscillates around you according to deterministic rules.
+Use the arrow keys or WASD to direct your Snake to eat the "apples" and grow ever longer while avoiding the fires of Life
+that rage around you. You can also click on a space to toggle it between living and dead. 
 
 Technologies
 ============
