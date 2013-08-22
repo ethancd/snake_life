@@ -294,7 +294,7 @@ var Program = (function(){
     $("ul").html("").css({
       "width": game.xDim*30 +"px", 
       "height": game.yDim*30 + "px",
-      "margin": "0px " + (700 - game.xDim*30)/2 + "px"
+      "margin": "0px " + (640 - game.xDim*30)/2 + "px"
     });
     for (var i = 0; i < game.yDim; i++) {
       for (var j = 0; j < game.xDim; j++) {
