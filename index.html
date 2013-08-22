@@ -25,10 +25,10 @@
           <input type="radio" name="size" value="12"><small>teensy</small>
         </label><br>
         <label>
-          <input type="radio" name="size" value="16">Small
+          <input type="radio" name="size" value="16">Cramped
         </label><br>
         <label>
-          <input type="radio" name="size" value="20" checked>Medium
+          <input type="radio" name="size" value="20" checked>Normal
         </label>
       </div>
 
@@ -37,7 +37,7 @@
           <input type="radio" name="timeStep" value="250">Slow
         </label><br>
         <label>
-          <input type="radio" name="timeStep" value="180" checked>Normal
+          <input type="radio" name="timeStep" value="180" checked>Medium
         </label><br>
         <label>
           <input type="radio" name="timeStep" value="120">Blazing
@@ -64,7 +64,7 @@
   </section>
   <script>
   $(function(){
-    $("form").on("submit", function(){
+    $("form").on("submit", function(event){
       event.preventDefault();
       var size = $('input[name=size]:checked').val();
       var timeStep = $('input[name=timeStep]:checked').val();
