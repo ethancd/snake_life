@@ -279,11 +279,12 @@ var Program = (function(){
   }
 
   var start = function(size, timeStep){
-      if (typeof game === "object"){
-        game.gameOver()
-      };
+    if (typeof game === "object"){
+      game.gameOver()
+    };
     game = new Game(size, timeStep);
 
+    resetInfo();
     populateBoard(game);
     bindMouse(game);
     bindKeys();
@@ -293,6 +294,12 @@ var Program = (function(){
       game.render();
       }, timeStep);
   };
+
+  var resetInfo = function(){
+    $(".info").addClass("hidden");
+    $(".final-score").addClass("gone");
+    $(".running-score").removeClass("hidden gone");
+  }
 
   var populateBoard = function(game){
     $("ul").html("").css({

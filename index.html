@@ -77,9 +77,6 @@
       event.preventDefault();
       var size = $('input[name=size]:checked').val();
       var timeStep = $('input[name=timeStep]:checked').val();
-      $(".info").addClass("hidden");
-      $(".final-score").addClass("gone");
-      $(".running-score").removeClass("hidden gone");
       Program.start(size, timeStep);
     }) 
   })
