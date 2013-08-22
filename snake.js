@@ -304,7 +304,7 @@ var Program = (function(){
   };
 
   var bindMouse = function(game){
-    $("html").on("mousedown", function(){
+    $("html").on("mousedown", function(event){
       if (event.target.tagName == "LI"){
         game.toggleLiving(event);
       }
@@ -341,10 +341,3 @@ var Program = (function(){
   return {start: start};
 
 })();
-
-
-
-
-
-
-
