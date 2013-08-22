@@ -254,7 +254,8 @@ var Program = (function(){
   };
 
   Game.prototype.gameOver = function() {
-    $("h2").toggleClass("gone");
+    $(".running-score").addClass("gone");
+    $(".final-score").removeClass("gone");
     $(".info").removeClass("hidden");
     clearInterval(handler);
   };
@@ -278,6 +279,9 @@ var Program = (function(){
   }
 
   var start = function(size, timeStep){
+      if (typeof game === "object"){
+        game.gameOver()
+      };
     game = new Game(size, timeStep);
 
     populateBoard(game);
