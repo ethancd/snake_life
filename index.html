@@ -6,12 +6,74 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Score = <strong class="score"></strong><em class="potential"></em></h2>
-  <ul></ul>
+  <header>
+    <h1><span class="snake">Snake</span> / <span class="life">Life</span></h1>
+    <h2 class="running-score hidden">
+      Score: <strong class="score">0</strong><em class="potential"></em>
+    </h2>
+    <h2 class="final-score gone">
+      Final Score: <strong class="score"></strong>
+    </h2>
+  </header>
 
+  <section>
+    <form action="" class="controls info">
+      <input type="submit" value="New Game">
+
+      <div>
+        <label>
+          <input type="radio" name="size" value="12"><small>teensy</small>
+        </label><br>
+        <label>
+          <input type="radio" name="size" value="16">Small
+        </label><br>
+        <label>
+          <input type="radio" name="size" value="20" checked>Medium
+        </label>
+      </div>
+
+      <div>
+        <label>
+          <input type="radio" name="timeStep" value="250">Slow
+        </label><br>
+        <label>
+          <input type="radio" name="timeStep" value="180" checked>Normal
+        </label><br>
+        <label>
+          <input type="radio" name="timeStep" value="120">Blazing
+        </label>
+      </div>
+    </form>
+
+    <ul></ul>
+
+    <article>
+      <p class="instructions info">
+        Use the arrow or WASD keys to move your snake around the board collecting 
+        apples, while being careful to avoid walls, the snake body, or the fire of life 
+        raging around you. You can also click and drag your mouse through spaces to
+        toggle whether they're alive -- useful when you need to disrupt a dangerous
+        formation.
+      </p>
+      <p class="instructions info">
+        You score more points the longer you stay alive, and get a bonus based on 
+        how many tiles are currently alive every time you eat an apple. Also, the 
+        faster the speed and smaller the board, the more points you get!
+      </p>
+    </article>
+  </section>
   <script>
   $(function(){
-    Program.start(20, 150);
+    $("form").on("submit", function(){
+      event.preventDefault();
+      var size = $('input[name=size]:checked').val();
+      var timeStep = $('input[name=timeStep]:checked').val();
+      $(".info").addClass("hidden");
+      $(".final-score").addClass("gone");
+      $(".running-score").removeClass("hidden gone");
+      Program.start(size, timeStep);
+    })
+    
   })
   </script>
 </body>

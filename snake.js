@@ -79,17 +79,6 @@ var Program = (function(){
       })
     })
 
-    this.sides = [];
-    for (var i = 0; i < game.yDim; i++){
-      this.sides.push([i, 0]);
-      this.sides.push([i, game.xDim-1]);
-    }
-
-    for (var j = 0; j < game.xDim; j++){
-      this.sides.push([0, j]);
-      this.sides.push([game.yDim-1, j]);
-    }
-
     var rPentomino = [
       [Math.floor(game.yDim/2)-2, Math.floor(game.xDim/2)  ], 
       [Math.floor(game.yDim/2)-2, Math.floor(game.xDim/2)+1], 
@@ -175,12 +164,12 @@ var Program = (function(){
     this.yDim = size;
     this.timeStep = timeStep;
 
-    this.scoreMod = Math.pow(((20/size) * (250 / this.timeStep)), 1.5);
+    this.scoreMod = Math.pow((Math.pow((20/size), 2) * (250 / this.timeStep)), 1.5);
     this.score = 0;
     this.potentialScore = 0;
     this.appleCount = 0;
     this.turnCount = 0;
-    this.delay = size;
+    this.delay = Math.floor(size/3);
 
     this.snake = new Snake(Math.floor(size/3), this);
     this.life = new Life(this);
@@ -188,15 +177,6 @@ var Program = (function(){
   };
 
   Game.prototype.update = function() {
-    var calm = $(".living").length < 30 && this.turnCount > this.delay;
-    console.log(this.life.list)
-
-    if (calm) {
-      this.life.list = _.union(this.life.list, this.life.sides);
-      this.turnCount = 0;
-      this.render();
-    }
-
     if (this.turnCount > this.delay) {
       this.life.update(this);
       this.render();
@@ -274,26 +254,22 @@ var Program = (function(){
   };
 
   Game.prototype.gameOver = function() {
-    $("h2").html("Final Score = <strong>" + this.score + "</strong>");
+    $("h2").toggleClass("gone");
+    $(".info").removeClass("hidden");
     clearInterval(handler);
   };
 
-  Game.prototype.douse = function(event){
-    $(event.target).addClass("water");
+  Game.prototype.toggleLiving = function(event){
     var cell = this.getId(event.target);
     if (this.life.has(cell)){
+      $(event.target).addClass("water");
       $(event.target).removeClass("living");
       this.life.list.splice(this.life.findObj(cell), 1);
-    }
-  };
-
-  Game.prototype.ignite = function(event){
-    $(event.target).addClass("living");
-    var cell = this.getId(event.target);
-    if (!(this.life.has(cell))){
+    } else {
+      $(event.target).addClass("living");
       this.life.list.push(cell);
     }
-  }
+  };
 
   Game.prototype.getId = function(target){
     var idY = parseInt($(target).attr("id").split("-")[1]);
@@ -315,7 +291,11 @@ var Program = (function(){
   };
 
   var populateBoard = function(game){
-    $("ul").css({"width": game.xDim*30 +"px", "height": game.yDim*30 + "px"});
+    $("ul").html("").css({
+      "width": game.xDim*30 +"px", 
+      "height": game.yDim*30 + "px",
+      "margin": "0px " + (700 - game.xDim*30)/2 + "px"
+    });
     for (var i = 0; i < game.yDim; i++) {
       for (var j = 0; j < game.xDim; j++) {
         $("ul").append('<li id="row-' + i + "-col-" + j + '"></li>');
@@ -325,12 +305,10 @@ var Program = (function(){
 
   var bindMouse = function(game){
     $("html").on("mousedown", function(){
-      var action = event.shiftKey ? game.ignite : game.douse;
-
       if (event.target.tagName == "LI"){
-        action.call(game, event);
+        game.toggleLiving(event);
       }
-      $("li").on("mouseenter", action.bind(game));
+      $("li").on("mouseenter", game.toggleLiving.bind(game));
       $("html").on("mouseup", function(){
         $("li").off("mouseenter");
       })
