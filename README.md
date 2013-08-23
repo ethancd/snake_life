@@ -1,8 +1,9 @@
 Snake/Life
 ==========
 
-What does an iconic mobile video game have in common with a cellular automaton generator? This project. 
-(Also they both originated in the 70's!)
+What does <a href="http://en.wikipedia.org/wiki/Snake_(video_game)">an iconic mobile video game</a> have in common with 
+<a href="http://en.wikipedia.org/wiki/Conway%27s_game_of_life">a cellular automaton generator</a>?
+This project. (Also they both originated in the 70's!)
 
 Use the arrow or WASD keys to move your snake around the board collecting 
 apples, while being careful to avoid walls, the snake body, or the fire of life 
