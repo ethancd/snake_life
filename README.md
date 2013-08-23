@@ -22,3 +22,5 @@ TODO
 
 * Add color variation for living cells based on their survival time
 * Tune code to improve performance
+* Solve click + drag slowdown & living/dead cell errors
+* Reimplement CSS in less.js
