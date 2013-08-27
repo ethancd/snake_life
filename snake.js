@@ -295,7 +295,7 @@ var Program = (function(){
 
     resetInfo();
     populateBoard(game);
-    setQuality(quality);
+    modifyStyle(game, quality);
     bindMouse(game);
     bindKeys();
 
@@ -312,7 +312,6 @@ var Program = (function(){
   }
 
   var populateBoard = function(game){
-    calculateLayout(game);
     $("ul").html("");
     for (var i = 0; i < game.yDim; i++) {
       for (var j = 0; j < game.xDim; j++) {
@@ -324,25 +323,32 @@ var Program = (function(){
   var setQuality = function(quality){
     switch(quality){
     case "fancy":
-      less.modifyVars({'@faded': '0.5'});
+      return {'@faded': '0.5'};
       break;
     case "less_fancy":
-      less.modifyVars({'@faded': '1.0'});
+      return {'@faded': '1.0'};
       break;
     case "plain":
-      less.modifyVars({'@faded': '1.0'});
       $("li").addClass("no-box-shadow");
+      return {'@faded': '1.0'};
     }
   };
-  
-  var calculateLayout = function(game){
-    less.modifyVars({
-      '@snake-fade': game.timeStep * Math.floor(game.xDim/3)  + "ms",
-      '@life-fade': game.timeStep * 3 +"ms",
-      '@game-size': game.xDim*30 + "px",
-      '@game-margin': _.max([(640 - game.xDim*30)/2, 20]) + "px",
+
+  var setLayout = function(game){
+    return {
+      '@snake-fade': game.timeStep * Math.floor(game.xDim/2) + "ms",
+      '@life-fade': game.timeStep * 30 + "ms",
+      '@game-size': game.xDim * 30 + "px",
+      '@game-margin': _.max([20, (640 - game.xDim*30)/2]) + "px",
       '@wrap-width': game.xDim <= 20 ? "1000px" : game.xDim * 30 + 400 + "px"
-    });
+    };
+  };
+  
+  var modifyStyle = function(game, quality){
+    var qualitySettings = setQuality(quality);
+    var layoutSettings = setLayout(game);
+
+    less.modifyVars($.extend(layoutSettings, qualitySettings));
   };
 
   var bindMouse = function(game){
