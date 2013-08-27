@@ -73,7 +73,8 @@ var Program = (function(){
   var Life = function(game) {
     var that = this;
     this.list = {};
-    this.generateCorners(game)
+    this.generateCorners(game);
+    this.activeCells = 5;
     var rPentomino = [
       [Math.floor(game.yDim/2)-2, Math.floor(game.xDim/2)  ], 
       [Math.floor(game.yDim/2)-2, Math.floor(game.xDim/2)+1], 
@@ -109,6 +110,7 @@ var Program = (function(){
 
   Life.prototype.update = function(game) {
     this.list = this.detectionSweep(game);
+    this.activeCells = (_.size(this.list) - _.size(this.corners));
   };
 
   Life.prototype.detectionSweep = function(game) {
@@ -178,11 +180,15 @@ var Program = (function(){
     if (this.turnCount > this.delay) {
       this.life.update(this);
       this.render();
+    } else {
+      this.life.activeCells = ($('.living').length - _.size(this.life.corners));
     }
 
     this.snake.update(this);
     this.turnCount += 1;
-    this.score += Math.ceil(Math.log(this.turnCount * _.size(this.life.list)));
+    this.score += Math.ceil(Math.log(
+      this.turnCount * this.life.activeCells * this.scoreMod / 500 + 1
+    ));
   };
 
   Game.prototype.render = function(){
@@ -213,10 +219,9 @@ var Program = (function(){
   };
 
   Game.prototype.calculatePotentialScore = function(){
-    var activeCells = (_.size(this.life.list) - _.size(this.life.corners));
-    return Math.floor(
-      (10 + this.appleCount) * activeCells * this.scoreMod
-    );
+    return _.max([0, Math.floor(
+      (10 + this.appleCount) * (this.life.activeCells - 1) * this.scoreMod
+    )]);
   };
 
   Game.prototype.updateClass = function(i, j){
@@ -281,14 +286,16 @@ var Program = (function(){
     return [idY, idX];
   }
 
-  var start = function(size, timeStep){
+  var start = function(size, timeStep, quality){
     if (typeof game === "object"){
-      game.gameOver()
+      game.gameOver();
     };
+
     game = new Game(size, timeStep);
 
     resetInfo();
     populateBoard(game);
+    setQuality(quality);
     bindMouse(game);
     bindKeys();
 
@@ -314,6 +321,20 @@ var Program = (function(){
     }
   };
 
+  var setQuality = function(quality){
+    switch(quality){
+    case "fancy":
+      less.modifyVars({'@faded': '0.5'});
+      break;
+    case "less_fancy":
+      less.modifyVars({'@faded': '1.0'});
+      break;
+    case "plain":
+      less.modifyVars({'@faded': '1.0'});
+      $("li").addClass("no-box-shadow");
+    }
+  };
+  
   var calculateLayout = function(game){
     less.modifyVars({
       '@snake-fade': game.timeStep * Math.floor(game.xDim/3)  + "ms",

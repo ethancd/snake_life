@@ -63,7 +63,7 @@
         </label>
       </div>
 
-      <div class="gone">
+      <div>
         <label>
           <input type="radio" name="quality" value="fancy" checked>
           Fancy
@@ -73,7 +73,7 @@
           Less Fancy
         </label><br>
         <label>
-          <input type="radio" name="quality" value="not_very_fancy">
+          <input type="radio" name="quality" value="plain">
           Plain
         </label><br>
       </div>
@@ -110,19 +110,9 @@
     $("form").on("submit", function(event){
       event.preventDefault();
       var quality = $('input[name=quality]:checked').val();
-      switch(quality){
-        case "fancy":
-          less.modifyVars({'@faded': '0.7'});
-          break;
-        case "less_fancy":
-          less.modifyVars({'@faded': '1.0'});
-          break;
-        case "plain":
-          less.modifyVars({'@faded': '1.0'});
-      }
       var size = $('input[name=size]:checked').val();
       var timeStep = $('input[name=timeStep]:checked').val();
-      Program.start(size, timeStep);
+      Program.start(size, timeStep, quality);
     }) 
   })
   </script>

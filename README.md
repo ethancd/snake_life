@@ -22,5 +22,4 @@ Technologies
 TODO
 ====
 
-* Add high/medium/low quality choices (to improve run-time/usability)
 * Add high score chart
