@@ -225,9 +225,10 @@ var Program = (function(){
     $cell.removeClass("water");
 
     if (this.snake.has([i,j])){
-      $cell.addClass("snake");
+      $cell.addClass("presnake");
+      setTimeout(function(){$cell.addClass("snake")}, 1);
     } else {
-      $cell.removeClass("snake");
+      $cell.removeClass("presnake snake");
     }
 
     if (this.apple && (this.apple[0] == i && this.apple[1] == j)) {
@@ -237,9 +238,10 @@ var Program = (function(){
     }
 
     if (this.life.has([i,j])){
-      $cell.addClass("living");
+      $cell.addClass("prelife");
+      setTimeout(function(){$cell.addClass("living")}, 1);
     } else {
-      $cell.removeClass("living");
+      $cell.removeClass("prelife living");
     }
   };
 
@@ -262,14 +264,13 @@ var Program = (function(){
 
   Game.prototype.toggleLiving = function(event){
     var cell = this.getId(event.target);
-    console.log(this.life.list);
-    console.log(_.size(this.life.list));
     if (this.life.has(cell)){
       $(event.target).addClass("water");
-      $(event.target).removeClass("living");
+      $(event.target).removeClass("prelife living");
       delete this.life.list[cell.join()];
     } else {
-      $(event.target).addClass("living");
+      $(event.target).addClass("prelife")
+      setTimeout(function(){$(event.target).addClass("living")}, 1, event);
       this.life.list[cell.join()] = true;
     }
   };
@@ -304,19 +305,23 @@ var Program = (function(){
   }
 
   var populateBoard = function(game){
-    var gameMargin = _.max([(640 - game.xDim*30)/2, 20])
-    $("ul").html("").css({
-      "width": game.xDim*30 +"px", 
-      "height": game.yDim*30 + "px",
-      "margin": "0px " + gameMargin + "px"
-    });
-    var wrapWidth = game.xDim <= 20 ? "1000px" : game.xDim * 30 + 400 + "px";
-    $(".wrap").css({ "width": wrapWidth});
+    calculateLayout(game);
+    $("ul").html("");
     for (var i = 0; i < game.yDim; i++) {
       for (var j = 0; j < game.xDim; j++) {
         $("ul").append('<li id="row-' + i + "-col-" + j + '"></li>');
       }
     }
+  };
+
+  var calculateLayout = function(game){
+    less.modifyVars({
+      '@snake-fade': game.timeStep * Math.floor(game.xDim/3)  + "ms",
+      '@life-fade': game.timeStep * 3 +"ms",
+      '@game-size': game.xDim*30 + "px",
+      '@game-margin': _.max([(640 - game.xDim*30)/2, 20]) + "px",
+      '@wrap-width': game.xDim <= 20 ? "1000px" : game.xDim * 30 + 400 + "px"
+    });
   };
 
   var bindMouse = function(game){

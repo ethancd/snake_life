@@ -1,0 +1,168 @@
+@fore: #000;
+@gray: #1d1d1d;
+@back: #fff;
+@life: #f00;
+@snake: #00b800;
+@water: #00f;
+
+@faded: 0.7;
+@snake-fade: 1000ms;
+@life-fade: 500ms;
+@game-size: 600px;
+@game-margin: 20px;
+@wrap-width: 1000px;
+
+
+html, body, article, input, form, h1, h2, ul, li, p {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font-family: sans-serif;
+}
+
+.hidden {
+  opacity: 0.0 !important;
+}
+
+.gone {
+  display: none !important;
+}
+
+body {
+  background-color: @gray;
+  color: @back;
+}
+
+.wrap {
+  width: @wrap-width;
+  margin: auto;
+}
+
+h1 {
+  width: @game-size;
+  margin: 20px 0px 0px 90px;
+  text-align: center;
+  font-size: 200%;
+
+  .snake {
+    color: @snake;
+  }
+
+  .life {  
+    color: @life;
+    text-shadow: 0px 0px 20px @life;
+  }
+}
+
+h2 {
+  margin-bottom: 30px;
+  font-size: 200%;
+
+  strong {
+    font-size: 150%;
+    color: @water;
+    text-shadow: 0px 0px 20px @water;
+  }
+
+  em {
+    color: @snake;
+    font-size: 60%;
+  }
+}
+
+.info {
+  -webkit-transition: opacity 0.2s;
+  transition: opacity 0.2s;
+  opacity: 1.0;
+}
+
+form.controls {
+  float: left;
+  text-shadow: 0px 0px 1px @back;
+
+  div {
+    margin: 10px 0px;
+  }
+
+  input[type="radio"]{
+    margin-right: 3px;
+  }
+
+  input[type="submit"]{
+    color: @fore;
+    padding: 0px 2px;
+    background-color: @life;
+    box-shadow: 0px 0px 20px @life;
+    border-radius: 5px;
+    cursor: pointer;
+
+    &:hover, &:focus {
+      outline: none;
+      background-color: @snake;
+      box-shadow: 0px 0px 20px @snake;
+    }
+  }
+}
+
+article {
+  width: 245px;
+  float: right;
+  text-align: justify;
+
+  .instructions {
+    font-size: 110%;
+    text-shadow: 0px 0px 1px @back;
+    margin-bottom: 20px;
+  }
+}
+
+ul {
+  float: left;
+  margin: 0px @game-margin;
+  list-style: none;
+  background-color: @fore;
+  width: @game-size;
+  height: @game-size;
+
+  li {
+    float: left;
+    display: block;
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    opacity: 0.0;
+
+
+    &.apple, &.water, &.prelife, &.presnake {
+      opacity: 1.0;
+    }
+
+    &.apple {
+      background: url("apple.png");
+      background-position: 2px 0px;
+      background-size: auto 30px;
+      background-repeat: no-repeat;
+    }
+
+    &.snake {
+      opacity: @faded;
+      -webkit-transition: opacity @snake-fade;
+      transition: opacity @snake-fade;
+      background-color: @snake;
+      box-shadow: 0px 0px 20px @snake;
+    }
+
+    &.living {
+      opacity: @faded;
+      background-color: @life;
+      box-shadow: 0px 0px 80px @life;
+      -webkit-transition: opacity @life-fade ease-out;
+      transition: opacity @life-fade ease-out;
+    }
+
+    &.water {
+      background-color: @water;
+    }
+  }
+}

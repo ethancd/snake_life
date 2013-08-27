@@ -1,9 +1,10 @@
 <html>
 <head>
+  <link rel="stylesheet/less" type="text/css" href="style.less">
   <script src="jquery-1.9.1.js"></script>
   <script src="underscore.js"></script>
+  <script src="less-1.4.1.min.js"></script>
   <script src="snake.js"></script>
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="wrap">
@@ -65,6 +66,21 @@
           Ludicrous
         </label>
       </div>
+
+      <div class="gone">
+        <label>
+          <input type="radio" name="quality" value="fancy" checked>
+          Fancy
+        </label><br>
+        <label>
+          <input type="radio" name="quality" value="less_fancy">
+          Less Fancy
+        </label><br>
+        <label>
+          <input type="radio" name="quality" value="not_very_fancy">
+          Plain
+        </label><br>
+      </div>
     </form>
 
     <ul></ul>
@@ -97,6 +113,17 @@
 
     $("form").on("submit", function(event){
       event.preventDefault();
+      var quality = $('input[name=quality]:checked').val();
+      switch(quality){
+        case "fancy":
+          less.modifyVars({'@faded': '0.7'});
+          break;
+        case "less_fancy":
+          less.modifyVars({'@faded': '1.0'});
+          break;
+        case "plain":
+          less.modifyVars({'@faded': '1.0'});
+      }
       var size = $('input[name=size]:checked').val();
       var timeStep = $('input[name=timeStep]:checked').val();
       Program.start(size, timeStep);
