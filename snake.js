@@ -63,7 +63,7 @@ var Program = (function(){
     } else if (game.offscreen(next) || this.has(next) || game.life.has(next)){
       game.gameOver();
     } else {
-      game.life.list.push(this.body.pop());
+      game.life.list[this.body.pop().join()] = true;
     }
 
     this.dir = this.nextDir;
@@ -72,22 +72,39 @@ var Program = (function(){
 
   var Life = function(game) {
     var that = this;
-    this.corners = []
-    _.each([0, 1, game.yDim-1, game.yDim-2], function(y){
-      _.each([0, 1, game.xDim-1, game.xDim-2], function(x){
-        that.corners.push([y,x]);
-      })
-    })
-
+    this.list = {};
+    this.generateCorners(game)
     var rPentomino = [
       [Math.floor(game.yDim/2)-2, Math.floor(game.xDim/2)  ], 
       [Math.floor(game.yDim/2)-2, Math.floor(game.xDim/2)+1], 
       [Math.floor(game.yDim/2)-1, Math.floor(game.xDim/2)  ], 
       [Math.floor(game.yDim/2)  , Math.floor(game.xDim/2)  ], 
       [Math.floor(game.yDim/2)-1, Math.floor(game.xDim/2)-1]
-    ]
+    ];
 
-    this.list = _.union(rPentomino, this.corners);
+    _.each(rPentomino, function(cell){
+      that.list[cell.join()] = true;
+    })
+    $.extend(this.list, this.corners);
+  };
+
+  Life.prototype.generateCorners = function(game) {
+    var reach = (game.xDim / 4) - 2;
+    var that = this;
+    var yArray = [];
+    var xArray = [];
+    this.corners = {};
+
+    for (var i = 0; i < reach; i++){
+      yArray.push(i, game.yDim-(i+1));
+      xArray.push(i, game.xDim-(i+1));
+    }
+
+    _.each(yArray, function(y){
+      _.each(xArray, function(x){
+        that.corners[[y,x].join()] = true;
+      })
+    })
   };
 
   Life.prototype.update = function(game) {
@@ -95,20 +112,17 @@ var Program = (function(){
   };
 
   Life.prototype.detectionSweep = function(game) {
-    var tempList = []
+    var tempList = {};
     for (var i = 0; i < game.yDim; i++) {
       for (var j = 0; j < game.xDim; j++) {
         var census = this.countLiving([i,j])
-
-        if (this.has([i,j]) && (census == 2 || census == 3)) {
-          tempList.push([i,j]);
-        } else if (census == 3) {
-          tempList.push([i,j]);
+        if (census == 3 || (this.has([i,j]) && census == 2)) {
+          tempList[[i,j].join()] = true;
         }
       }
     }
 
-    return _.union(tempList, this.corners)
+    return $.extend(tempList, this.corners)
   };
 
   Life.prototype.countLiving = function(cell) {
@@ -140,23 +154,7 @@ var Program = (function(){
   };
 
   Life.prototype.has = function(coord){
-    var full = false;
-    _.each(this.list, function(elem){
-      if (elem[0] == coord[0] && elem[1] == coord[1]) {
-        full = true;
-      }
-    })
-    return full;
-  };
-
-  Life.prototype.findObj = function(coord){
-    var idx = null;
-    _.each(this.list, function(elem, i){
-      if (elem[0] == coord[0] && elem[1] == coord[1]) {
-        idx = i;
-      }
-    })
-    return idx;
+    return this.list[coord.join()];
   };
 
   var Game = function(size, timeStep){
@@ -164,7 +162,7 @@ var Program = (function(){
     this.yDim = size;
     this.timeStep = timeStep;
 
-    this.scoreMod = Math.pow((Math.pow((20/size), 2) * (250 / this.timeStep)), 1.5);
+    this.scoreMod = Math.pow(Math.pow(20/size, 1.5) * (300 / this.timeStep), 1);
     this.score = 0;
     this.potentialScore = 0;
     this.appleCount = 0;
@@ -184,7 +182,7 @@ var Program = (function(){
 
     this.snake.update(this);
     this.turnCount += 1;
-    this.score += (Math.ceil(Math.log(this.turnCount * this.life.list.length)));
+    this.score += Math.ceil(Math.log(this.turnCount * _.size(this.life.list)));
   };
 
   Game.prototype.render = function(){
@@ -215,8 +213,9 @@ var Program = (function(){
   };
 
   Game.prototype.calculatePotentialScore = function(){
+    var activeCells = (_.size(this.life.list) - _.size(this.life.corners));
     return Math.floor(
-      (10 + this.appleCount) * (this.life.list.length - 16) * this.scoreMod
+      (10 + this.appleCount) * activeCells * this.scoreMod
     );
   };
 
@@ -257,18 +256,21 @@ var Program = (function(){
     $(".running-score").addClass("gone");
     $(".final-score").removeClass("gone");
     $(".info").removeClass("hidden");
+    $("html").off("mousedown").off("keydown");
     clearInterval(handler);
   };
 
   Game.prototype.toggleLiving = function(event){
     var cell = this.getId(event.target);
+    console.log(this.life.list);
+    console.log(_.size(this.life.list));
     if (this.life.has(cell)){
       $(event.target).addClass("water");
       $(event.target).removeClass("living");
-      this.life.list.splice(this.life.findObj(cell), 1);
+      delete this.life.list[cell.join()];
     } else {
       $(event.target).addClass("living");
-      this.life.list.push(cell);
+      this.life.list[cell.join()] = true;
     }
   };
 
@@ -302,11 +304,14 @@ var Program = (function(){
   }
 
   var populateBoard = function(game){
+    var gameMargin = _.max([(640 - game.xDim*30)/2, 20])
     $("ul").html("").css({
       "width": game.xDim*30 +"px", 
       "height": game.yDim*30 + "px",
-      "margin": "0px " + (640 - game.xDim*30)/2 + "px"
+      "margin": "0px " + gameMargin + "px"
     });
+    var wrapWidth = game.xDim <= 20 ? "1000px" : game.xDim * 30 + 400 + "px";
+    $(".wrap").css({ "width": wrapWidth});
     for (var i = 0; i < game.yDim; i++) {
       for (var j = 0; j < game.xDim; j++) {
         $("ul").append('<li id="row-' + i + "-col-" + j + '"></li>');

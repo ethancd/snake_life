@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
+  <header class="wrap">
     <h1><span class="snake">Snake</span> / <span class="life">Life</span></h1>
     <h2 class="running-score hidden">
       Score: <strong class="score">0</strong><em class="potential"></em>
@@ -16,31 +16,53 @@
     </h2>
   </header>
 
-  <section>
+  <section class="wrap">
     <form action="" class="controls info">
       <input type="submit" value="New Game">
 
       <div>
         <label>
-          <input type="radio" name="size" value="12"><small>teensy</small>
+          <input type="radio" name="size" value="8">
+          Sub-Atomic
         </label><br>
         <label>
-          <input type="radio" name="size" value="16">Cramped
+          <input type="radio" name="size" value="12">
+          Teensy
         </label><br>
         <label>
-          <input type="radio" name="size" value="20" checked>Normal
+          <input type="radio" name="size" value="16">
+          Cramped
+        </label><br>
+        <label>
+          <input type="radio" name="size" value="20" checked>
+          Normal
+        </label><br>
+        <label>
+          <input type="radio" name="size" value="24">
+          Huge
         </label>
       </div>
 
       <div>
         <label>
-          <input type="radio" name="timeStep" value="250">Slow
+          <input type="radio" name="timeStep" value="500">
+          Claymation
         </label><br>
         <label>
-          <input type="radio" name="timeStep" value="180" checked>Medium
+          <input type="radio" name="timeStep" value="300">
+          Slow
         </label><br>
         <label>
-          <input type="radio" name="timeStep" value="120">Blazing
+          <input type="radio" name="timeStep" value="200" checked>
+          Medium
+        </label><br>
+        <label>
+          <input type="radio" name="timeStep" value="140">
+          Blazing
+        </label><br>
+        <label>
+          <input type="radio" name="timeStep" value="100">
+          Ludicrous
         </label>
       </div>
     </form>
@@ -67,7 +89,7 @@
   </section>
   <script>
   $(function(){
-    $("html").on("keydown", function(event){
+    $("html").on("keypress", function(event){
       if (event.keyCode == 13){
         $("form").submit();
       }

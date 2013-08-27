@@ -20,7 +20,7 @@ body {
   font-family: sans-serif;
 }
 
-header, section {
+.wrap {
   width: 1000px;
   margin: auto;
 }
@@ -99,7 +99,7 @@ form.controls input[type="submit"]:focus {
 }
 
 article {
-  width: 255px;
+  width: 245px;
   float: right;
   text-align: justify;
 }
