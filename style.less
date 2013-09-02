@@ -22,7 +22,7 @@ html, body, article, input, form, h1, h2, ul, li, p {
 }
 
 .hidden {
-  opacity: 0.0 !important;
+  opacity: 0 !important;
 }
 
 .gone {
@@ -146,11 +146,11 @@ ul {
     width: 30px;
     height: 30px;
     border-radius: 5px;
-    opacity: 0.0;
+    opacity: 0;
 
 
-    &.apple, &.water, &.prelife, &.presnake {
-      opacity: 1.0;
+    &.apple, &.water, &.presnake {
+      opacity: 1;
     }
 
     &.apple {
@@ -163,6 +163,10 @@ ul {
     &.snake {
       .fader(@snake-fade, @faded);
       .box-shadow(@snake);
+    }
+
+    &.prelife {
+      opacity: 1;
     }
 
     &.living {
