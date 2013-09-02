@@ -90,6 +90,11 @@ h2 {
   }
 }
 
+div.plexiglass {
+  width: 100%;
+  height: 100%;
+}
+
 .info {
   .fader;
 }
@@ -149,7 +154,7 @@ ul {
     opacity: 0;
 
 
-    &.apple, &.water, &.presnake {
+    &.apple, &.water, &.presnake, &.prelife {
       opacity: 1;
     }
 
@@ -163,10 +168,6 @@ ul {
     &.snake {
       .fader(@snake-fade, @faded);
       .box-shadow(@snake);
-    }
-
-    &.prelife {
-      opacity: 1;
     }
 
     &.living {
