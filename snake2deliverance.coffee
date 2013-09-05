@@ -47,11 +47,10 @@ window.Program = do ->
     window.less.modifyVars($.extend(setLayout(game), setQuality(quality)))
 
   bindMouse = (game) ->
-    $("html").on mousedown: 
-      (event) ->
-        game.toggleLiving(event) if event.target.tagName is "LI"
-        $("li").on(mouseenter: -> game.toggleLiving.bind(game))
-        $("html").on(mouseup: -> $("li").off("mouseenter"))
+    $("html").on "mousedown", (event) ->
+      game.toggleLiving(event) if event.target.tagName is "LI"
+      $("li").on "mouseenter", game.toggleLiving.bind(game)
+      $("html").on "mouseup", -> $("li").off("mouseenter")
 
   bindKeys = (game) ->
     $('html').on keydown:

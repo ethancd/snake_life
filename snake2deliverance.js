@@ -68,22 +68,14 @@
       return window.less.modifyVars($.extend(setLayout(game), setQuality(quality)));
     };
     bindMouse = function(game) {
-      return $("html").on({
-        mousedown: function(event) {
-          if (event.target.tagName === "LI") {
-            game.toggleLiving(event);
-          }
-          $("li").on({
-            mouseenter: function() {
-              return game.toggleLiving.bind(game);
-            }
-          });
-          return $("html").on({
-            mouseup: function() {
-              return $("li").off("mouseenter");
-            }
-          });
+      return $("html").on("mousedown", function(event) {
+        if (event.target.tagName === "LI") {
+          game.toggleLiving(event);
         }
+        $("li").on("mouseenter", game.toggleLiving.bind(game));
+        return $("html").on("mouseup", function() {
+          return $("li").off("mouseenter");
+        });
       });
     };
     bindKeys = function(game) {
