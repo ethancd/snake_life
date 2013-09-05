@@ -7,12 +7,11 @@ var Program = (function(){
   };
 
   Snake.prototype.buildBody = function(length, game){
-    this.body = []
-    var startY = Math.floor(0.75 * game.yDim)
+    this.body = [];
+    var startY = Math.floor(0.75 * game.yDim);
     var startX = Math.floor(0.5  * game.xDim);
 
-    this.body.push([startY, startX]) 
-    for (var i = 1; i < length; i++) {
+    for (var i = 0; i < length; i++) {
       this.body.push([startY, startX-i]);
     }
   }
