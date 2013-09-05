@@ -88,7 +88,7 @@ window.Program = do ->
 
     update: ->
       next = do @findNext
-      if next.join() is @game.apple.join()
+      if @game.apple? and next.join() is @game.apple.join()
         do @game.addApple 
       else if @game.offscreen(next) or @has(next) or @game.life.has(next)
         do @game.gameOver 
@@ -199,7 +199,7 @@ window.Program = do ->
           Math.floor(Math.random()*@xDim)
         ]
 
-        unless (@apple and @apple.join() is coord.join()) or
+        unless (@apple? and @apple.join() is coord.join()) or
                 @snake.has(coord) or 
                 @life.has(coord)
           break

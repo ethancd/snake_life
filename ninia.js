@@ -164,7 +164,7 @@
       Snake.prototype.update = function() {
         var next;
         next = this.findNext();
-        if (next.join() === this.game.apple.join()) {
+        if ((this.game.apple != null) && next.join() === this.game.apple.join()) {
           this.game.addApple();
         } else if (this.game.offscreen(next) || this.has(next) || this.game.life.has(next)) {
           this.game.gameOver();
@@ -342,7 +342,7 @@
         var coord;
         while (true) {
           coord = [Math.floor(Math.random() * this.yDim), Math.floor(Math.random() * this.xDim)];
-          if (!((this.apple && this.apple.join() === coord.join()) || this.snake.has(coord) || this.life.has(coord))) {
+          if (!(((this.apple != null) && this.apple.join() === coord.join()) || this.snake.has(coord) || this.life.has(coord))) {
             break;
           }
         }
