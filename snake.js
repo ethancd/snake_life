@@ -286,6 +286,7 @@ var Program = (function(){
   }
 
   var start = function(size, timeStep, quality){
+    var game;
     if (typeof game === "object"){
       game.gameOver();
     };
@@ -296,7 +297,7 @@ var Program = (function(){
     populateBoard(game);
     modifyStyle(game, quality);
     bindMouse(game);
-    bindKeys();
+    bindKeys(game);
 
     handler = setInterval(function(){
       game.update();
@@ -323,10 +324,8 @@ var Program = (function(){
     switch(quality){
     case "fancy":
       return {'@faded': '0.5'};
-      break;
     case "less_fancy":
       return {'@faded': '1.0'};
-      break;
     case "plain":
       $("li").addClass("no-box-shadow");
       return {'@faded': '1.0'};
@@ -362,7 +361,7 @@ var Program = (function(){
     })
   };
 
-  var bindKeys = function(){
+  var bindKeys = function(game){
     $('html').on("keydown", function(event) {
       switch (event.keyCode){
       case 38:

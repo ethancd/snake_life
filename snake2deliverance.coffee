@@ -1,5 +1,67 @@
 window.Program = do ->
 
+  start = (size, timeStep, quality) ->
+    game.gameOver() if game?
+    window.game = new Game(timeStep, size)
+
+    resetInfo()
+    populateBoard(game)
+    modifyStyle(game, quality)
+    bindMouse(game)
+    bindKeys(game)
+
+    window.handler = setInterval ->
+        game.update()
+        game.render()
+      , timeStep
+
+  resetInfo = ->
+    $(".info").addClass("hidden")
+    $(".final-score").addClass("gone")
+    $(".running-score").removeClass("hidden gone")
+
+  populateBoard = (game) ->
+    $("ul").html("")
+    for i in [0...game.yDim]
+      for j in [0...game.xDim]
+        $("ul").append("<li id='row-#{i}-col-#{j}'></li>")
+
+  setQuality = (quality) -> 
+    switch quality
+      when "fancy" then {"@faded": "0.5"}
+      when "less_fancy" then {"@faded": "1"}
+      when "plain"
+        $("li").addClass("no-box-shadow")
+        {"@faded": "1"}
+
+  setLayout = (game) ->
+    {
+      '@snake-fade': game.timeStep * Math.floor(game.xDim/2) + "ms",
+      '@life-fade': game.timeStep * 30 + "ms",
+      '@game-size': game.xDim * 30 + "px",
+      '@game-margin': _.max([20, (640 - game.xDim*30)/2]) + "px",
+      '@wrap-width': if game.xDim <= 20 then "1000px" else game.xDim * 30 + 400 + "px"
+    }
+
+  modifyStyle = (game, quality) ->
+    window.less.modifyVars($.extend(setLayout(game), setQuality(quality)))
+
+  bindMouse = (game) ->
+    $("html").on mousedown: 
+      (event) ->
+        game.toggleLiving(event) if event.target.tagName is "LI"
+        $("li").on(mouseenter: -> game.toggleLiving.bind(game))
+        $("html").on(mouseup: -> $("li").off("mouseenter"))
+
+  bindKeys = (game) ->
+    $('html').on keydown:
+      (event) ->
+        switch event.keyCode
+          when 38, 87 then do game.snake.north
+          when 37, 65 then do game.snake.west
+          when 40, 83 then do game.snake.south
+          when 39, 68 then do game.snake.east
+
   class Snake
     constructor: (@game, length) -> 
       @dir = [0,1]
@@ -10,13 +72,14 @@ window.Program = do ->
       startY = Math.floor(0.75 * @game.yDim)
       startX = Math.floor(0.5  * @game.xDim)
 
-      @body = while (length -= 1) + 1 
-        [startY, startX - length]
+      i = -1 
+      @body = while (i++ < length)
+        [startY, startX - i]
 
-    north: -> @nextDir = [-1, 0] if @dir[0] != 1
-    south: -> @nextDir = [ 1, 0] if @dir[0] != -1
-    east:  -> @nextDir = [ 0, 1] if @dir[1] != 1
-    west:  -> @nextDir = [ 0,-1] if @dir[1] != -1
+    north: -> @nextDir = [-1, 0] if @dir[0] isnt  1
+    south: -> @nextDir = [ 1, 0] if @dir[0] isnt -1
+    east:  -> @nextDir = [ 0, 1] if @dir[1] isnt  1
+    west:  -> @nextDir = [ 0,-1] if @dir[1] isnt -1
 
     has: (coord) -> 
       (return true if coord.join() is part.join()) for part in @body
@@ -31,9 +94,9 @@ window.Program = do ->
       else if @game.offscreen(next) or @has(next) or @game.life.has(next)
         do @game.gameOver 
       else
-        @game.life.list[this.body.shift().join()] = true
+        @game.life.list[this.body.pop().join()] = true
       @dir = @nextDir
-      @body.push(next)
+      @body.unshift(next)
 
   class Life
     constructor: (@game) ->
@@ -54,15 +117,16 @@ window.Program = do ->
       $.extend(@list, @corners)
 
     generateCorners: ->
-      offset = [@game.xDim/4 - 2, 0].min
+      offset = _.max([Math.floor(@game.xDim/4) - 3, 0])
       @corners = {}
       [y, x] = [@game.yDim - 1, @game.xDim - 1]
-      yArray = i + offset for i in [0,1].concat (y - offset - i for i in [0,1])
-      xArray = i + offset for i in [0,1].concat (x - offset - i for i in [0,1])
 
-      cells = for x in xArray 
+      yArray = [offset, offset + 1, y - offset, y - offset - 1]
+      xArray = [offset, offset + 1, x - offset, x - offset - 1]
+
+      cells = [].concat((for x in xArray 
         do (x) ->
-          [y, x] for y in yArray
+          [y, x] for y in yArray)...)
 
       @corners[cell.join()] = true for cell in cells
       
@@ -99,9 +163,9 @@ window.Program = do ->
       @xDim = @yDim = size
       @score = @potentialScore = @appleCount = @turnCount = 0
       @scoreMod = Math.pow(Math.pow(20/size, 1.5) * (300/@timeStep), 1.1)
-      @delay = Math.floor(size/3)
+      @delay = length = Math.floor(size/3)
 
-      @snake = new Snake @delay, @
+      @snake = new Snake @, length
       @life = new Life @
 
       do @addApple
@@ -146,7 +210,7 @@ window.Program = do ->
       @apple = coord
 
     calculatePotentialScore: -> _.max([0, Math.floor(
-        (10 + @appleCount) * (@life.activeCells -1) * @scoreMod)])
+        (10 + @appleCount) * (@life.activeCells - 1) * @scoreMod)])
 
     updateClass: (i, j) ->
       $cell = $("#row-#{i}-col-#{j}")
@@ -175,11 +239,11 @@ window.Program = do ->
       coord[0] < 0 or coord[0] >= @yDim or coord[1] < 0 or coord[1] >= @xDim
 
     gameOver: ->
-      $(".running-score").addClass("gone");
-      $(".final-score").removeClass("gone");
-      $(".info").removeClass("hidden");
-      $("html").off("mousedown").off("keydown");
-      clearInterval(handler);
+      $(".running-score").addClass("gone")
+      $(".final-score").removeClass("gone")
+      $(".info").removeClass("hidden")
+      $("html").off("mousedown").off("keydown")
+      clearInterval(handler)
 
     toggleLiving: (event) ->
       node = event.target
@@ -197,69 +261,6 @@ window.Program = do ->
     getId: (target) ->
       [parseInt($(target).attr("id").split("-")[1]),
        parseInt($(target).attr("id").split("-")[3])]
-
-  start = (timeStep, size, quality) ->
-    game.gameOver if game?
-
-    game = new Game(timeStep, size)
-
-    resetInfo()
-    populateBoard(game)
-    modifyStyle(game, quality)
-    bindMouse(game)
-    bindKeys()
-
-    handler = setInterval (->
-      game.update()
-      game.render()
-      ), timeStep
-
-  resetInfo = ->
-    $(".info").addClass("hidden")
-    $(".final-score").addClass("gone")
-    $(".running-score").removeClass("hidden gone")
-
-  populateBoard = (game) ->
-    $("ul").html("")
-    for i in [0...game.yDim]
-      for j in [0...game.xDim]
-        $("ul").append("<li id='row-#{i}-col-#{j}'></li>")
-
-  setQuality = (quality) -> 
-    switch quality
-      when "fancy" then {"@faded": "0.5"}
-      when "less_fancy" then {"@faded": "1"}
-      when "plain"
-        $("li").addClass("no-box-shadow")
-        {"@faded": "1"}
-
-  setLayout = (game) ->
-    {
-      '@snake-fade': game.timeStep * Math.floor(game.xDim/2) + "ms",
-      '@life-fade': game.timeStep * 30 + "ms",
-      '@game-size': game.xDim * 30 + "px",
-      '@game-margin': _.max([20, (640 - game.xDim*30)/2]) + "px",
-      '@wrap-width': game.xDim <= 20 ? "1000px" : game.xDim * 30 + 400 + "px"
-    }
-
-  modifyStyle = (game, quality) ->
-    window.less.modifyVars($.extend(setLayout(game), setQuality(quality)))
-
-  bindMouse = (game) ->
-    $("html").on mousedown: 
-      (event) ->
-        game.toggleLiving(event) if event.target.tagName is "LI"
-        $("li").on(mouseenter: -> game.toggleLiving.bind(game))
-        $("html").on(mouseup: -> $("li").off("mouseenter"))
-
-  bindKeys = ->
-    $('html').on keydown:
-      (event) ->
-        switch event.keyCode
-          when 38, 87 then do game.snake.north
-          when 37, 65 then do game.snake.west
-          when 40, 83 then do game.snake.south
-          when 39, 68 then do game.snake.east
 
   {start: start}
 

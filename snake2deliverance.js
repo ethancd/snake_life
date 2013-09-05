@@ -2,6 +2,110 @@
 (function() {
   window.Program = (function() {
     var Game, Life, Snake, bindKeys, bindMouse, modifyStyle, populateBoard, resetInfo, setLayout, setQuality, start;
+    start = function(size, timeStep, quality) {
+      if (typeof game !== "undefined" && game !== null) {
+        game.gameOver();
+      }
+      window.game = new Game(timeStep, size);
+      resetInfo();
+      populateBoard(game);
+      modifyStyle(game, quality);
+      bindMouse(game);
+      bindKeys(game);
+      return window.handler = setInterval(function() {
+        game.update();
+        return game.render();
+      }, timeStep);
+    };
+    resetInfo = function() {
+      $(".info").addClass("hidden");
+      $(".final-score").addClass("gone");
+      return $(".running-score").removeClass("hidden gone");
+    };
+    populateBoard = function(game) {
+      var i, j, _i, _ref, _results;
+      $("ul").html("");
+      _results = [];
+      for (i = _i = 0, _ref = game.yDim; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+        _results.push((function() {
+          var _j, _ref1, _results1;
+          _results1 = [];
+          for (j = _j = 0, _ref1 = game.xDim; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; j = 0 <= _ref1 ? ++_j : --_j) {
+            _results1.push($("ul").append("<li id='row-" + i + "-col-" + j + "'></li>"));
+          }
+          return _results1;
+        })());
+      }
+      return _results;
+    };
+    setQuality = function(quality) {
+      switch (quality) {
+        case "fancy":
+          return {
+            "@faded": "0.5"
+          };
+        case "less_fancy":
+          return {
+            "@faded": "1"
+          };
+        case "plain":
+          $("li").addClass("no-box-shadow");
+          return {
+            "@faded": "1"
+          };
+      }
+    };
+    setLayout = function(game) {
+      return {
+        '@snake-fade': game.timeStep * Math.floor(game.xDim / 2) + "ms",
+        '@life-fade': game.timeStep * 30 + "ms",
+        '@game-size': game.xDim * 30 + "px",
+        '@game-margin': _.max([20, (640 - game.xDim * 30) / 2]) + "px",
+        '@wrap-width': game.xDim <= 20 ? "1000px" : game.xDim * 30 + 400 + "px"
+      };
+    };
+    modifyStyle = function(game, quality) {
+      return window.less.modifyVars($.extend(setLayout(game), setQuality(quality)));
+    };
+    bindMouse = function(game) {
+      return $("html").on({
+        mousedown: function(event) {
+          if (event.target.tagName === "LI") {
+            game.toggleLiving(event);
+          }
+          $("li").on({
+            mouseenter: function() {
+              return game.toggleLiving.bind(game);
+            }
+          });
+          return $("html").on({
+            mouseup: function() {
+              return $("li").off("mouseenter");
+            }
+          });
+        }
+      });
+    };
+    bindKeys = function(game) {
+      return $('html').on({
+        keydown: function(event) {
+          switch (event.keyCode) {
+            case 38:
+            case 87:
+              return game.snake.north();
+            case 37:
+            case 65:
+              return game.snake.west();
+            case 40:
+            case 83:
+              return game.snake.south();
+            case 39:
+            case 68:
+              return game.snake.east();
+          }
+        }
+      });
+    };
     Snake = (function() {
       function Snake(game, length) {
         this.game = game;
@@ -11,14 +115,15 @@
       }
 
       Snake.prototype.buildBody = function(length) {
-        var startX, startY;
+        var i, startX, startY;
         startY = Math.floor(0.75 * this.game.yDim);
         startX = Math.floor(0.5 * this.game.xDim);
+        i = -1;
         return this.body = (function() {
           var _results;
           _results = [];
-          while ((length -= 1) + 1) {
-            _results.push([startY, startX - length]);
+          while (i++ < length) {
+            _results.push([startY, startX - i]);
           }
           return _results;
         })();
@@ -72,10 +177,10 @@
         } else if (this.game.offscreen(next) || this.has(next) || this.game.life.has(next)) {
           this.game.gameOver();
         } else {
-          this.game.life.list[this.body.shift().join()] = true;
+          this.game.life.list[this.body.pop().join()] = true;
         }
         this.dir = this.nextDir;
-        return this.body.push(next);
+        return this.body.unshift(next);
       };
 
       return Snake;
@@ -109,58 +214,32 @@
       }
 
       Life.prototype.generateCorners = function() {
-        var cell, cells, i, offset, x, xArray, y, yArray, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _results;
-        offset = [this.game.xDim / 4 - 2, 0].min;
+        var cell, cells, offset, x, xArray, y, yArray, _i, _len, _ref, _ref1, _results;
+        offset = _.max([Math.floor(this.game.xDim / 4) - 3, 0]);
         this.corners = {};
         _ref = [this.game.yDim - 1, this.game.xDim - 1], y = _ref[0], x = _ref[1];
-        _ref1 = [0, 1].concat((function() {
-          var _j, _len, _ref1, _results;
-          _ref1 = [0, 1];
+        yArray = [offset, offset + 1, y - offset, y - offset - 1];
+        xArray = [offset, offset + 1, x - offset, x - offset - 1];
+        cells = (_ref1 = []).concat.apply(_ref1, (function() {
+          var _i, _len, _results;
           _results = [];
-          for (_j = 0, _len = _ref1.length; _j < _len; _j++) {
-            i = _ref1[_j];
-            _results.push(y - offset - i);
-          }
-          return _results;
-        })());
-        for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-          i = _ref1[_i];
-          yArray = i + offset;
-        }
-        _ref2 = [0, 1].concat((function() {
-          var _k, _len1, _ref2, _results;
-          _ref2 = [0, 1];
-          _results = [];
-          for (_k = 0, _len1 = _ref2.length; _k < _len1; _k++) {
-            i = _ref2[_k];
-            _results.push(x - offset - i);
-          }
-          return _results;
-        })());
-        for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
-          i = _ref2[_j];
-          xArray = i + offset;
-        }
-        cells = (function() {
-          var _k, _len2, _results;
-          _results = [];
-          for (_k = 0, _len2 = xArray.length; _k < _len2; _k++) {
-            x = xArray[_k];
+          for (_i = 0, _len = xArray.length; _i < _len; _i++) {
+            x = xArray[_i];
             _results.push((function(x) {
-              var _l, _len3, _results1;
+              var _j, _len1, _results1;
               _results1 = [];
-              for (_l = 0, _len3 = yArray.length; _l < _len3; _l++) {
-                y = yArray[_l];
+              for (_j = 0, _len1 = yArray.length; _j < _len1; _j++) {
+                y = yArray[_j];
                 _results1.push([y, x]);
               }
               return _results1;
             })(x));
           }
           return _results;
-        })();
+        })());
         _results = [];
-        for (_k = 0, _len2 = cells.length; _k < _len2; _k++) {
-          cell = cells[_k];
+        for (_i = 0, _len = cells.length; _i < _len; _i++) {
+          cell = cells[_i];
           _results.push(this.corners[cell.join()] = true);
         }
         return _results;
@@ -221,12 +300,13 @@
     })();
     Game = (function() {
       function Game(timeStep, size) {
+        var length;
         this.timeStep = timeStep;
         this.xDim = this.yDim = size;
         this.score = this.potentialScore = this.appleCount = this.turnCount = 0;
         this.scoreMod = Math.pow(Math.pow(20 / size, 1.5) * (300 / this.timeStep), 1.1);
-        this.delay = Math.floor(size / 3);
-        this.snake = new Snake(this.delay, this);
+        this.delay = length = Math.floor(size / 3);
+        this.snake = new Snake(this, length);
         this.life = new Life(this);
         this.addApple();
       }
@@ -280,7 +360,7 @@
       };
 
       Game.prototype.calculatePotentialScore = function() {
-        return _.max([0, Math.floor((10 + this.appleCount) * (this.life.activeCells(-1)) * this.scoreMod)]);
+        return _.max([0, Math.floor((10 + this.appleCount) * (this.life.activeCells - 1) * this.scoreMod)]);
       };
 
       Game.prototype.updateClass = function(i, j) {
@@ -347,114 +427,6 @@
       return Game;
 
     })();
-    start = function(timeStep, size, quality) {
-      var game, handler;
-      if (typeof game !== "undefined" && game !== null) {
-        game.gameOver;
-      }
-      game = new Game(timeStep, size);
-      resetInfo();
-      populateBoard(game);
-      modifyStyle(game, quality);
-      bindMouse(game);
-      bindKeys();
-      return handler = setInterval((function() {
-        game.update();
-        return game.render();
-      }), timeStep);
-    };
-    resetInfo = function() {
-      $(".info").addClass("hidden");
-      $(".final-score").addClass("gone");
-      return $(".running-score").removeClass("hidden gone");
-    };
-    populateBoard = function(game) {
-      var i, j, _i, _ref, _results;
-      $("ul").html("");
-      _results = [];
-      for (i = _i = 0, _ref = game.yDim; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
-        _results.push((function() {
-          var _j, _ref1, _results1;
-          _results1 = [];
-          for (j = _j = 0, _ref1 = game.xDim; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; j = 0 <= _ref1 ? ++_j : --_j) {
-            _results1.push($("ul").append("<li id='row-" + i + "-col-" + j + "'></li>"));
-          }
-          return _results1;
-        })());
-      }
-      return _results;
-    };
-    setQuality = function(quality) {
-      switch (quality) {
-        case "fancy":
-          return {
-            "@faded": "0.5"
-          };
-        case "less_fancy":
-          return {
-            "@faded": "1"
-          };
-        case "plain":
-          $("li").addClass("no-box-shadow");
-          return {
-            "@faded": "1"
-          };
-      }
-    };
-    setLayout = function(game) {
-      var _ref;
-      return {
-        '@snake-fade': game.timeStep * Math.floor(game.xDim / 2) + "ms",
-        '@life-fade': game.timeStep * 30 + "ms",
-        '@game-size': game.xDim * 30 + "px",
-        '@game-margin': _.max([20, (640 - game.xDim * 30) / 2]) + "px",
-        '@wrap-width': (_ref = game.xDim <= 20) != null ? _ref : {
-          "1000px": game.xDim * 30 + 400 + "px"
-        }
-      };
-    };
-    modifyStyle = function(game, quality) {
-      return window.less.modifyVars($.extend(setLayout(game), setQuality(quality)));
-    };
-    bindMouse = function(game) {
-      return $("html").on({
-        mousedown: function(event) {
-          if (event.target.tagName === "LI") {
-            game.toggleLiving(event);
-          }
-          $("li").on({
-            mouseenter: function() {
-              return game.toggleLiving.bind(game);
-            }
-          });
-          return $("html").on({
-            mouseup: function() {
-              return $("li").off("mouseenter");
-            }
-          });
-        }
-      });
-    };
-    bindKeys = function() {
-      return $('html').on({
-        keydown: function(event) {
-          switch (event.keyCode) {
-            case 38:
-            case 87:
-              return game.snake.north();
-            case 37:
-            case 65:
-              return game.snake.west();
-            case 40:
-            case 83:
-              return game.snake.south();
-            case 39:
-            case 68:
-              return game.snake.east();
-          }
-        }
-      });
-    };
     return {
       start: start
     };
