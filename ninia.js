@@ -134,13 +134,13 @@
       };
 
       Snake.prototype.east = function() {
-        if (this.dir[1] !== 1) {
+        if (this.dir[1] !== -1) {
           return this.nextDir = [0, 1];
         }
       };
 
       Snake.prototype.west = function() {
-        if (this.dir[1] !== -1) {
+        if (this.dir[1] !== 1) {
           return this.nextDir = [0, -1];
         }
       };

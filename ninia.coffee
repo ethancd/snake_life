@@ -77,8 +77,8 @@ window.Program = do ->
 
     north: -> @nextDir = [-1, 0] if @dir[0] isnt  1
     south: -> @nextDir = [ 1, 0] if @dir[0] isnt -1
-    east:  -> @nextDir = [ 0, 1] if @dir[1] isnt  1
-    west:  -> @nextDir = [ 0,-1] if @dir[1] isnt -1
+    east:  -> @nextDir = [ 0, 1] if @dir[1] isnt -1
+    west:  -> @nextDir = [ 0,-1] if @dir[1] isnt  1
 
     has: (coord) -> 
       (return true if coord.join() is part.join()) for part in @body
