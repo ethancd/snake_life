@@ -250,7 +250,6 @@ window.Program = do ->
       $("html").off("mousedown").off("keydown")
       if game.music
         [song, sfx] = $("audio").get()
-        song.currentTime = 0
         song.pause()
         sfx.volume = song.volume
         sfx.play()

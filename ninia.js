@@ -405,7 +405,6 @@
         $("html").off("mousedown").off("keydown");
         if (game.music) {
           _ref = $("audio").get(), song = _ref[0], sfx = _ref[1];
-          song.currentTime = 0;
           song.pause();
           sfx.volume = song.volume;
           sfx.play();
