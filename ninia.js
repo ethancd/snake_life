@@ -388,12 +388,11 @@
       };
 
       Game.prototype.gameOver = function() {
-        console.log("fuckin over?");
         $(".running-score").addClass("gone");
         $(".final-score").removeClass("gone");
         $(".info").removeClass("hidden");
         $("html").off("mousedown").off("keydown");
-        $("audio").remove();
+        $(".audio").remove();
         clearInterval(handler);
         return window.game = null;
       };

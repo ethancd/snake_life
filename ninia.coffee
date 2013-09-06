@@ -238,12 +238,11 @@ window.Program = do ->
       coord[0] < 0 or coord[0] >= @yDim or coord[1] < 0 or coord[1] >= @xDim
 
     gameOver: ->
-      console.log("fuckin over?")
       $(".running-score").addClass("gone")
       $(".final-score").removeClass("gone")
       $(".info").removeClass("hidden")
       $("html").off("mousedown").off("keydown")
-      $("audio").remove()
+      $(".audio").remove()
       clearInterval(handler)
       window.game = null
 

@@ -123,12 +123,16 @@
       var timeStep = $('input[name=timeStep]:checked').val();
       var music = $('input[name=music]:checked').val() == "true" ? true : false;
       if (music) {
-        $("article").append('<audio controls autoplay>' + 
-          '<source src="chip.mp3" type="audio/mpeg">' +
-          '<source src="chip.ogg" type="audio/ogg">' +
-          'Your browser does not support this audio format.' +
-        '</audio>')
-      }
+        $("article").append('<div class="audio">' + 
+            '<audio controls autoplay>' + 
+              '<source src="chip.mp3" type="audio/mpeg">' +
+              '<source src="chip.ogg" type="audio/ogg">' +
+              'Your browser does not support this audio format.' +
+            '</audio>' +
+            '<a href="http://www.anamanaguchi.com/singles/">' +
+            '\'Airbrushed\' by Anamanaguchi</a>' +
+          '</div>'
+      )}
 
       Program.start(size, timeStep, quality);
     }) 
