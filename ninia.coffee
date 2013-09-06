@@ -1,19 +1,25 @@
 window.Program = do ->
 
-  start = (size, timeStep, quality) ->
+  start = (size, timeStep, quality, music) ->
     game.gameOver() if game?
-    window.game = new Game(timeStep, size)
+    window.game = new Game(timeStep, size, music)
 
     resetInfo()
     populateBoard(game)
     modifyStyle(game, quality)
     bindMouse(game)
     bindKeys(game)
+    playSong() if (music) 
 
     window.handler = setInterval ->
         game.update()
         game.render()
       , timeStep
+
+  playSong = -> 
+    song = $(".song")[0]
+    song.currentTime = 0
+    song.play()
 
   resetInfo = ->
     $(".info").addClass("hidden")
@@ -158,7 +164,7 @@ window.Program = do ->
     has: (coord) -> @list[coord.join()]
 
   class Game
-    constructor: (@timeStep, size) ->
+    constructor: (@timeStep, size, @music) ->
       @xDim = @yDim = size
       @score = @potentialScore = @appleCount = @turnCount = 0
       @scoreMod = Math.pow(Math.pow(20/size, 1.5) * (300/@timeStep), 1.1)
@@ -242,8 +248,13 @@ window.Program = do ->
       $(".final-score").removeClass("gone")
       $(".info").removeClass("hidden")
       $("html").off("mousedown").off("keydown")
-      $("audio")[0].currentTime = 0
-      $("audio")[0].pause()
+      if game.music
+        [song, sfx] = $("audio").get()
+        song.currentTime = 0
+        song.pause()
+        sfx.volume = song.volume
+        sfx.play()
+
       clearInterval(handler)
       window.game = null
 

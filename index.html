@@ -2,9 +2,10 @@
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet/less" type="text/css" href="style.less">
-  <script src="jquery-1.9.1.js"></script>
-  <script src="underscore.js"></script>
-  <script src="less-1.4.1.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libs/jquery-1.10.2.min.js"><\/script>')</script>
+  <script src="libs/underscore-min.js"></script>
+  <script src="libs/less-1.4.1.min.js"></script>
   <script src="ninia.js"></script>
 </head>
 <body>
@@ -78,12 +79,12 @@
       <div>
         <label>
           <input type="radio" name="music" value="true">
-          Music<img src="speaker_three.png">
+          Music<img src="images/speaker_three.png">
         </label>
         <br>
         <label>
           <input type="radio" name="music" value="false" checked>
-          Mute<img src="speaker_none.png">
+          Mute<img src="images/speaker_none.png">
         </label>
       </div>
     </form>
@@ -108,20 +109,27 @@
       </p>
 
       <div class="audio">
-        <audio controls loop>
-          <source src="chip.mp3" type="audio/mpeg">
-          <source src="chip.ogg" type="audio/ogg">
+        <audio controls loop class="song">
+          <source src="audio/chip.mp3" type="audio/mpeg">
+          <source src="audio/chip.ogg" type="audio/ogg">
           Your browser does not support this audio format.
         </audio>
         <a href="http://www.anamanaguchi.com/singles/">
-          &quot;Airbrushed&quot; by Anamanaguchi
+          &#9835; &quot;Airbrushed&quot; by Anamanaguchi
         </a>
+      </div>
+      <div class="audio gone">
+        <audio class="sfx">
+          <source src="audio/scratch.mp3" type="audio/mpeg">
+          <source src="audio/scratch.ogg" type="audio/ogg">
+          Your browser does not support this audio format.
+        </audio>
       </div>
     </article>
   </section>
   <script>
   $(function(){
-    var song = $("audio")[0];
+    var song = $(".song")[0];
     song.volume = 0.5;
 
     $("html").on("keypress", function(event){
@@ -136,9 +144,8 @@
       var size = $('input[name=size]:checked').val();
       var timeStep = $('input[name=timeStep]:checked').val();
       var music = $('input[name=music]:checked').val() == "true" ? true : false;
-      if (music) song.play();
-
-      Program.start(size, timeStep, quality);
+      
+      Program.start(size, timeStep, quality, music);
     }) 
   })
   </script>
