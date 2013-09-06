@@ -13,7 +13,7 @@ window.Program = do ->
 
     window.handler = setInterval ->
         game.update()
-        game.render()
+        game.render() if game?
       , timeStep
 
   playSong = -> 
