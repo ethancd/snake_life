@@ -17,7 +17,9 @@
       }
       return window.handler = setInterval(function() {
         game.update();
-        return game.render();
+        if (typeof game !== "undefined" && game !== null) {
+          return game.render();
+        }
       }, timeStep);
     };
     playSong = function() {
