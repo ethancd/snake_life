@@ -18,8 +18,8 @@ window.Program = do ->
 
   playSong = -> 
     song = $(".song")[0]
-    song.currentTime = 0
     song.play()
+    song.currentTime = 0
 
   resetInfo = ->
     $(".info").addClass("hidden")
@@ -251,8 +251,8 @@ window.Program = do ->
       if game.music
         [song, sfx] = $("audio").get()
         song.pause()
-        sfx.volume = song.volume
         sfx.play()
+        sfx.volume = song.volume
 
       clearInterval(handler)
       window.game = null

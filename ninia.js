@@ -23,8 +23,8 @@
     playSong = function() {
       var song;
       song = $(".song")[0];
-      song.currentTime = 0;
-      return song.play();
+      song.play();
+      return song.currentTime = 0;
     };
     resetInfo = function() {
       $(".info").addClass("hidden");
@@ -406,8 +406,8 @@
         if (game.music) {
           _ref = $("audio").get(), song = _ref[0], sfx = _ref[1];
           song.pause();
-          sfx.volume = song.volume;
           sfx.play();
+          sfx.volume = song.volume;
         }
         clearInterval(handler);
         return window.game = null;
