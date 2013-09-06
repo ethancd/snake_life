@@ -1,5 +1,6 @@
 <html>
 <head>
+  <meta charset="utf-8">
   <link rel="stylesheet/less" type="text/css" href="style.less">
   <script src="jquery-1.9.1.js"></script>
   <script src="underscore.js"></script>
@@ -33,7 +34,7 @@
         <label>
           <input type="radio" name="size" value="20" checked>
           Normal
-        </label><br>
+        </label>
       </div>
 
       <div>
@@ -71,7 +72,19 @@
         <label>
           <input type="radio" name="quality" value="plain">
           Plain
-        </label><br>
+        </label>
+      </div>
+
+      <div>
+        <label>
+          <input type="radio" name="music" value="true">
+          Music<img src="speaker_three.png">
+        </label>
+        <br>
+        <label>
+          <input type="radio" name="music" value="false" checked>
+          Mute<img src="speaker_none.png">
+        </label>
       </div>
     </form>
 
@@ -108,6 +121,15 @@
       var quality = $('input[name=quality]:checked').val();
       var size = $('input[name=size]:checked').val();
       var timeStep = $('input[name=timeStep]:checked').val();
+      var music = $('input[name=music]:checked').val() == "true" ? true : false;
+      if (music) {
+        $("article").append('<audio controls autoplay>' + 
+          '<source src="chip.mp3" type="audio/mpeg">' +
+          '<source src="chip.ogg" type="audio/ogg">' +
+          'Your browser does not support this audio format.' +
+        '</audio>')
+      }
+
       Program.start(size, timeStep, quality);
     }) 
   })

@@ -388,11 +388,14 @@
       };
 
       Game.prototype.gameOver = function() {
+        console.log("fuckin over?");
         $(".running-score").addClass("gone");
         $(".final-score").removeClass("gone");
         $(".info").removeClass("hidden");
         $("html").off("mousedown").off("keydown");
-        return clearInterval(handler);
+        $("audio").remove();
+        clearInterval(handler);
+        return window.game = null;
       };
 
       Game.prototype.toggleLiving = function(event) {
