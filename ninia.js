@@ -392,7 +392,8 @@
         $(".final-score").removeClass("gone");
         $(".info").removeClass("hidden");
         $("html").off("mousedown").off("keydown");
-        $(".audio").remove();
+        $("audio")[0].currentTime = 0;
+        $("audio")[0].pause();
         clearInterval(handler);
         return window.game = null;
       };

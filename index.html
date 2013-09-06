@@ -106,10 +106,24 @@
       <p class="instructions info">
         Press Enter to start a new game with current settings.
       </p>
+
+      <div class="audio">
+        <audio controls loop>
+          <source src="chip.mp3" type="audio/mpeg">
+          <source src="chip.ogg" type="audio/ogg">
+          Your browser does not support this audio format.
+        </audio>
+        <a href="http://www.anamanaguchi.com/singles/">
+          &quot;Airbrushed&quot; by Anamanaguchi
+        </a>
+      </div>
     </article>
   </section>
   <script>
   $(function(){
+    var song = $("audio")[0];
+    song.volume = 0.5;
+
     $("html").on("keypress", function(event){
       if (event.keyCode == 13){
         $("form").submit();
@@ -122,17 +136,7 @@
       var size = $('input[name=size]:checked').val();
       var timeStep = $('input[name=timeStep]:checked').val();
       var music = $('input[name=music]:checked').val() == "true" ? true : false;
-      if (music) {
-        $("article").append('<div class="audio">' + 
-            '<audio controls autoplay>' + 
-              '<source src="chip.mp3" type="audio/mpeg">' +
-              '<source src="chip.ogg" type="audio/ogg">' +
-              'Your browser does not support this audio format.' +
-            '</audio>' +
-            '<a href="http://www.anamanaguchi.com/singles/">' +
-            '\'Airbrushed\' by Anamanaguchi</a>' +
-          '</div>'
-      )}
+      if (music) song.play();
 
       Program.start(size, timeStep, quality);
     }) 
