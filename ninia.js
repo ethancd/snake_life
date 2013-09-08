@@ -26,9 +26,7 @@
       var song;
       $('div.audio').removeClass("hidden");
       song = $(".song")[0];
-      song.webkitPreservesPitch = false;
       song.play();
-      song.playbackRate = 300 / timeStep;
       return song.currentTime = 0;
     };
     resetInfo = function(music) {

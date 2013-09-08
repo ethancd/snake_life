@@ -19,9 +19,9 @@ window.Program = do ->
   playSong = (timeStep) ->
     $('div.audio').removeClass("hidden") 
     song = $(".song")[0]
-    song.webkitPreservesPitch = false
+    #song.webkitPreservesPitch = false #not functioning
     song.play()
-    song.playbackRate = 300 / timeStep
+    #song.playbackRate = 300 / timeStep #not sure if good idea
     song.currentTime = 0
 
   resetInfo = (music) ->
