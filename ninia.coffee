@@ -4,27 +4,31 @@ window.Program = do ->
     game.gameOver() if game?
     window.game = new Game(timeStep, size, music)
 
-    resetInfo()
+    resetInfo(music)
     populateBoard(game)
     modifyStyle(game, quality)
     bindMouse(game)
     bindKeys(game)
-    playSong() if (music) 
+    playSong(timeStep) if (music) 
 
     window.handler = setInterval ->
         game.update()
         game.render() if game?
       , timeStep
 
-  playSong = -> 
+  playSong = (timeStep) ->
+    $('div.audio').removeClass("hidden") 
     song = $(".song")[0]
+    song.webkitPreservesPitch = false
     song.play()
+    song.playbackRate = 300 / timeStep
     song.currentTime = 0
 
-  resetInfo = ->
+  resetInfo = (music) ->
     $(".info").addClass("hidden")
     $(".final-score").addClass("gone")
     $(".running-score").removeClass("hidden gone")
+    $("div.audio").addClass("hidden") unless music
 
   populateBoard = (game) ->
     $("ul").html("")
@@ -167,7 +171,7 @@ window.Program = do ->
     constructor: (@timeStep, size, @music) ->
       @xDim = @yDim = size
       @score = @potentialScore = @appleCount = @turnCount = 0
-      @scoreMod = Math.pow(Math.pow(20/size, 1.5) * (300/@timeStep), 1.1)
+      @scoreMod = Math.pow(Math.pow(20/size, 1.5) * (350/@timeStep), 1.1)
       @delay = length = Math.floor(size/3)
 
       @snake = new Snake @, length

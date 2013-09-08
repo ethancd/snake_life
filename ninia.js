@@ -7,13 +7,13 @@
         game.gameOver();
       }
       window.game = new Game(timeStep, size, music);
-      resetInfo();
+      resetInfo(music);
       populateBoard(game);
       modifyStyle(game, quality);
       bindMouse(game);
       bindKeys(game);
       if (music) {
-        playSong();
+        playSong(timeStep);
       }
       return window.handler = setInterval(function() {
         game.update();
@@ -22,16 +22,22 @@
         }
       }, timeStep);
     };
-    playSong = function() {
+    playSong = function(timeStep) {
       var song;
+      $('div.audio').removeClass("hidden");
       song = $(".song")[0];
+      song.webkitPreservesPitch = false;
       song.play();
+      song.playbackRate = 300 / timeStep;
       return song.currentTime = 0;
     };
-    resetInfo = function() {
+    resetInfo = function(music) {
       $(".info").addClass("hidden");
       $(".final-score").addClass("gone");
-      return $(".running-score").removeClass("hidden gone");
+      $(".running-score").removeClass("hidden gone");
+      if (!music) {
+        return $("div.audio").addClass("hidden");
+      }
     };
     populateBoard = function(game) {
       var i, j, _i, _ref, _results;
@@ -308,7 +314,7 @@
         this.music = music;
         this.xDim = this.yDim = size;
         this.score = this.potentialScore = this.appleCount = this.turnCount = 0;
-        this.scoreMod = Math.pow(Math.pow(20 / size, 1.5) * (300 / this.timeStep), 1.1);
+        this.scoreMod = Math.pow(Math.pow(20 / size, 1.5) * (350 / this.timeStep), 1.1);
         this.delay = length = Math.floor(size / 3);
         this.snake = new Snake(this, length);
         this.life = new Life(this);
