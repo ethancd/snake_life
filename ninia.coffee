@@ -2,14 +2,16 @@ window.Program = do ->
 
   start = (size, timeStep, quality, music) ->
     game.gameOver() if game?
-    window.game = new Game(timeStep, size, music)
 
     resetInfo(music)
-    populateBoard(game)
-    modifyStyle(game, quality)
+    populateBoard(size)
+    modifyStyle(size, timeStep, quality)
+    playSong(timeStep) if (music) 
+
+    window.game = new Game(timeStep, size, music)
+
     bindMouse(game)
     bindKeys(game)
-    playSong(timeStep) if (music) 
 
     window.handler = setInterval ->
         game.update()
@@ -30,10 +32,10 @@ window.Program = do ->
     $(".running-score").removeClass("hidden gone")
     $("div.audio").addClass("hidden") unless music
 
-  populateBoard = (game) ->
+  populateBoard = (size) ->
     $("ul").html("")
-    for i in [0...game.yDim]
-      for j in [0...game.xDim]
+    for i in [0...size]
+      for j in [0...size]
         $("ul").append("<li id='row-#{i}-col-#{j}'></li>")
 
   setQuality = (quality) -> 
@@ -44,17 +46,17 @@ window.Program = do ->
         $("li").addClass("no-box-shadow")
         {"@faded": "1"}
 
-  setLayout = (game) ->
+  setLayout = (size, timeStep) ->
     {
-      '@snake-fade': game.timeStep * Math.floor(game.xDim/2) + "ms",
-      '@life-fade': game.timeStep * 30 + "ms",
-      '@game-size': game.xDim * 30 + "px",
-      '@game-margin': _.max([20, (640 - game.xDim*30)/2]) + "px",
-      '@wrap-width': if game.xDim <= 20 then "1000px" else game.xDim * 30 + 400 + "px"
+      '@snake-fade': timeStep * Math.floor(size/2) + "ms",
+      '@life-fade': timeStep * 30 + "ms",
+      '@game-size': size * 30 + "px",
+      '@game-margin': _.max([20, (640 - size*30)/2]) + "px",
+      '@wrap-width': if size <= 20 then "1000px" else size * 30 + 400 + "px"
     }
 
-  modifyStyle = (game, quality) ->
-    window.less.modifyVars($.extend(setLayout(game), setQuality(quality)))
+  modifyStyle = (size, timeStep, quality) ->
+    window.less.modifyVars($.extend(setLayout(size, timeStep), setQuality(quality)))
 
   bindMouse = (game) ->
     $("html").on "mousedown", (event) ->
@@ -70,6 +72,8 @@ window.Program = do ->
           when 37, 65 then do game.snake.west
           when 40, 83 then do game.snake.south
           when 39, 68 then do game.snake.east
+
+  $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
   class Snake
     constructor: (@game, length) -> 
@@ -99,11 +103,12 @@ window.Program = do ->
     update: ->
       next = do @findNext
       if @game.apple? and next.join() is @game.apple.join()
+        $find(next).removeClass("apple")
         do @game.addApple 
       else if @game.offscreen(next) or @has(next) or @game.life.has(next)
         do @game.gameOver 
       else
-        @game.life.list[this.body.pop().join()] = true
+        @game.life.list[@body.pop().join()] = true
       @dir = @nextDir
       @body.unshift(next)
 
@@ -197,10 +202,7 @@ window.Program = do ->
       @potentialScore = do @calculatePotentialScore
       $(".score").html(" " + @score)
       $(".potential").html(" + " + @potentialScore)
-
-      for i in [0...@yDim]
-        for j in [0...@xDim]
-          @updateClass(i, j)
+      do @updateClass
 
     addApple: ->
       loop
@@ -217,32 +219,33 @@ window.Program = do ->
       @appleCount += 1
       @score += @potentialScore
       @apple = coord
+      console.log($find(@apple))
+      $find(@apple).addClass("apple")
 
     calculatePotentialScore: -> _.max([0, Math.floor(
         (10 + @appleCount) * (@life.activeCells - 1) * @scoreMod)])
 
-    updateClass: (i, j) ->
-      $cell = $("#row-#{i}-col-#{j}")
-      coord = [i,j]
-      
-      $cell.removeClass("water")
+    updateClass: ->
+      $cells = $("li")      
+      $cells.removeClass("water")
 
-      if @snake.has(coord)
-        $cell.addClass("presnake");
-        setTimeout ( -> $cell.addClass("snake")), 1
-      else
-        $cell.removeClass("presnake snake")
+      for cell in $cells
+        cellArr = cell.id.split("-")
+        coord = [parseInt(cellArr[1]), parseInt(cellArr[3])]
 
-      if (@apple and @apple.join() is coord.join())
-        $cell.addClass("apple")
-      else
-        $cell.removeClass("apple")
+        if @snake.has(coord)
+          cell.className += " presnake"
+          ((cell) -> setTimeout ( -> cell.className += " snake"), 1)(cell)
+        else
+          cell.className = cell.className.replace( /(?:^|\s)presnake(?!\S)/ , '' )
+          cell.className = cell.className.replace( /(?:^|\s)snake(?!\S)/ , '' )
 
-      if @life.has(coord)
-        $cell.addClass("prelife");
-        setTimeout ( -> $cell.addClass("living")), 1
-      else
-        $cell.removeClass("prelife living")
+        if @life.has(coord)
+          cell.className += " prelife"
+          ((cell) -> setTimeout ( -> cell.className += " living"), 1)(cell)
+        else
+          cell.className = cell.className.replace( /(?:^|\s)prelife(?!\S)/ , '' )
+          cell.className = cell.className.replace( /(?:^|\s)living(?!\S)/ , '' )
 
     offscreen: (coord) ->
       coord[0] < 0 or coord[0] >= @yDim or coord[1] < 0 or coord[1] >= @xDim
