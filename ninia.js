@@ -357,7 +357,6 @@
         this.appleCount += 1;
         this.score += this.potentialScore;
         this.apple = coord;
-        console.log($find(this.apple));
         return $find(this.apple).addClass("apple");
       };
 
@@ -375,23 +374,29 @@
           cellArr = cell.id.split("-");
           coord = [parseInt(cellArr[1]), parseInt(cellArr[3])];
           if (this.snake.has(coord)) {
-            cell.className += " presnake";
-            (function(cell) {
-              return setTimeout((function() {
-                return cell.className += " snake";
-              }), 1);
-            })(cell);
+            if (cell.className.indexOf("presnake") === -1) {
+              cell.className += " presnake";
+              (function(cell) {
+                return setTimeout((function() {
+                  return cell.className += " snake";
+                }), 1);
+              })(cell);
+            }
           } else {
             cell.className = cell.className.replace(/(?:^|\s)presnake(?!\S)/, '');
             cell.className = cell.className.replace(/(?:^|\s)snake(?!\S)/, '');
           }
           if (this.life.has(coord)) {
-            cell.className += " prelife";
-            _results.push((function(cell) {
-              return setTimeout((function() {
-                return cell.className += " living";
-              }), 1);
-            })(cell));
+            if (cell.className.indexOf("prelife") === -1) {
+              cell.className += " prelife";
+              _results.push((function(cell) {
+                return setTimeout((function() {
+                  return cell.className += " living";
+                }), 1);
+              })(cell));
+            } else {
+              _results.push(void 0);
+            }
           } else {
             cell.className = cell.className.replace(/(?:^|\s)prelife(?!\S)/, '');
             _results.push(cell.className = cell.className.replace(/(?:^|\s)living(?!\S)/, ''));

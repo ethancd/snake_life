@@ -219,7 +219,6 @@ window.Program = do ->
       @appleCount += 1
       @score += @potentialScore
       @apple = coord
-      console.log($find(@apple))
       $find(@apple).addClass("apple")
 
     calculatePotentialScore: -> _.max([0, Math.floor(
@@ -234,15 +233,17 @@ window.Program = do ->
         coord = [parseInt(cellArr[1]), parseInt(cellArr[3])]
 
         if @snake.has(coord)
-          cell.className += " presnake"
-          ((cell) -> setTimeout ( -> cell.className += " snake"), 1)(cell)
+          if cell.className.indexOf("presnake") is -1
+            cell.className += " presnake"
+            ((cell) -> setTimeout ( -> cell.className += " snake"), 1)(cell)
         else
           cell.className = cell.className.replace( /(?:^|\s)presnake(?!\S)/ , '' )
           cell.className = cell.className.replace( /(?:^|\s)snake(?!\S)/ , '' )
 
         if @life.has(coord)
-          cell.className += " prelife"
-          ((cell) -> setTimeout ( -> cell.className += " living"), 1)(cell)
+          if cell.className.indexOf("prelife") is -1
+            cell.className += " prelife"
+            ((cell) -> setTimeout ( -> cell.className += " living"), 1)(cell)
         else
           cell.className = cell.className.replace( /(?:^|\s)prelife(?!\S)/ , '' )
           cell.className = cell.className.replace( /(?:^|\s)living(?!\S)/ , '' )
