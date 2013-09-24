@@ -6,6 +6,7 @@
   <link href='/snake_life/favicon.ico' rel="shortcut icon" type="image/vnd.microsoft.icon">
   <link rel="stylesheet/less" type="text/css" href="style.less">
 
+  <script src="https://cdn.firebase.com/v0/firebase.js"></script>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="libs/jquery-1.10.2.min.js"><\/script>')</script>
   <script src="libs/underscore-min.js"></script>
@@ -21,6 +22,13 @@
     <h2 class="final-score gone">
       Final Score: <strong class="score"></strong>
     </h2>
+    <h2 class="personal-high gone">
+      Personal High Score: <strong class="score">0</strong>
+    </h2>
+    <div class="high-score gone">
+      <h2>High Scores:</h2>
+      <table></table>
+    </div>
   </header>
 
   <section class="wrap">

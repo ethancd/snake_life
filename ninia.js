@@ -31,6 +31,8 @@
     };
     resetInfo = function(music) {
       $(".info").addClass("hidden");
+      $(".personal-high").removeClass("gone");
+      $(".high-score").addClass("gone");
       $(".final-score").addClass("gone");
       $(".running-score").removeClass("hidden gone");
       if (!music) {
@@ -340,9 +342,16 @@
       };
 
       Game.prototype.render = function() {
+        var high;
         this.potentialScore = this.calculatePotentialScore();
         $(".score").html(" " + this.score);
         $(".potential").html(" + " + this.potentialScore);
+        high = parseInt($(".personal-high .score").html());
+        console.log(high);
+        console.log(this.score);
+        if (this.score > high) {
+          $(".personal-high .score").html(" " + this.score);
+        }
         return this.updateClass();
       };
 
