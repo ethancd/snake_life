@@ -25,6 +25,8 @@
     <h2 class="final-score gone">
       Final Score: <strong class="score"></strong>
     </h2>
+    <button class="show-scores hidden">High Scores</button>
+    
     <div class="all-high-score gone">
       <h2>High Scores:</h2>
       <table></table>
@@ -154,6 +156,8 @@
   </section>
   <script>
   $(function(){
+    highScoreRef = new Firebase("https://snake-life.firebaseio.com//scoreList");
+    snakeUserName = "ethancd"
     var song = $(".song")[0];
     song.volume = 0.5;
 

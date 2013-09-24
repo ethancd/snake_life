@@ -77,6 +77,9 @@ window.Program = do ->
 
   $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
+  getName = () ->
+
+
   class Snake
     constructor: (@game, length) -> 
       @dir = [0,1]
@@ -176,6 +179,7 @@ window.Program = do ->
 
   class Game
     constructor: (@timeStep, size, @music) ->
+      @startTime = new Date()
       @xDim = @yDim = size
       @score = @potentialScore = @appleCount = @turnCount = 0
       @scoreMod = Math.pow(Math.pow(20/size, 1.5) * (350/@timeStep), 1.1)
@@ -256,10 +260,16 @@ window.Program = do ->
       coord[0] < 0 or coord[0] >= @yDim or coord[1] < 0 or coord[1] >= @xDim
 
     gameOver: ->
+      rawTime = Math.floor((new Date().getTime() - @startTime.getTime()) / 1000)
+      minutes = Math.floor(rawTime / 60) + ":"
+      seconds = if rawTime % 60 < 10 then "0" + rawTime % 60 else rawTime % 60
+      @time = minutes + seconds
       $(".running-score").addClass("gone")
       $(".final-score").removeClass("gone")
       $(".info").removeClass("hidden")
+      $("button.show-scores").removeClass("hidden")
       $("html").off("mousedown").off("keydown")
+
       if game.music
         [song, sfx] = $("audio").get()
         song.pause()
@@ -267,8 +277,21 @@ window.Program = do ->
         sfx.volume = song.volume
 
       clearInterval(handler)
+      @postHighScore()
+
       window.game = null
 
+    postHighScore: ->
+      if window.snakeUserName?
+        id = Math.random().toString(36).slice(2)
+        userScoreRef = window.highScoreRef.child(id);
+        userScoreRef.setWithPriority({ 
+          name: window.snakeUserName, 
+          score:@score, 
+          time: @time}, 1/@score)
+      else
+        getName()
+      
     toggleLiving: (event) ->
       node = event.target
       cell = @getId(node)
