@@ -31,8 +31,8 @@
     };
     resetInfo = function(music) {
       $(".info").addClass("hidden");
-      $(".personal-high").removeClass("gone");
-      $(".high-score").addClass("gone");
+      $(".personal-high").removeClass("hidden");
+      $(".all-high-score").addClass("gone");
       $(".final-score").addClass("gone");
       $(".running-score").removeClass("hidden gone");
       if (!music) {
@@ -346,11 +346,9 @@
         this.potentialScore = this.calculatePotentialScore();
         $(".score").html(" " + this.score);
         $(".potential").html(" + " + this.potentialScore);
-        high = parseInt($(".personal-high .score").html());
-        console.log(high);
-        console.log(this.score);
+        high = parseInt($(".high-score").html());
         if (this.score > high) {
-          $(".personal-high .score").html(" " + this.score);
+          $(".high-score").html(" " + this.score);
         }
         return this.updateClass();
       };

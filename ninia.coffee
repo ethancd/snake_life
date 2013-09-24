@@ -28,8 +28,8 @@ window.Program = do ->
 
   resetInfo = (music) ->
     $(".info").addClass("hidden")
-    $(".personal-high").removeClass("gone")
-    $(".high-score").addClass("gone")
+    $(".personal-high").removeClass("hidden")
+    $(".all-high-score").addClass("gone")
     $(".final-score").addClass("gone")
     $(".running-score").removeClass("hidden gone")
     $("div.audio").addClass("hidden") unless music
@@ -204,10 +204,8 @@ window.Program = do ->
       @potentialScore = do @calculatePotentialScore
       $(".score").html(" " + @score)
       $(".potential").html(" + " + @potentialScore)
-      high = parseInt($(".personal-high .score").html())
-      console.log(high)
-      console.log(@score)
-      $(".personal-high .score").html(" " + @score) if @score > high
+      high = parseInt($(".high-score").html())
+      $(".high-score").html(" " + @score) if @score > high
       do @updateClass
 
     addApple: ->

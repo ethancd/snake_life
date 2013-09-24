@@ -13,7 +13,7 @@
 @wrap-width: 1000px;
 
 
-html, body, article, input, form, h1, h2, ul, ol, li, p {
+html, body, article, input, form, h1, h2, h3, ul, ol, li, p {
   margin: 0;
   padding: 0;
   border: 0;
@@ -32,6 +32,12 @@ html, body, article, input, form, h1, h2, ul, ol, li, p {
 body {
   background-color: @gray;
   color: @fore;
+}
+
+.group:after {
+  clear: both;
+  content: "";
+  display: table;
 }
 
 .wrap {
@@ -78,10 +84,6 @@ h2 {
   margin-bottom: 30px;
   font-size: 200%;
 
-  &.personal-high {
-    float: right;
-  }
-
   strong {
     font-size: 150%;
     color: @water;
@@ -91,6 +93,17 @@ h2 {
   em {
     color: @snake;
     font-size: 60%;
+  }
+}
+
+h3 {
+  font-size: 150%;
+  color: darken(@fore, 20%);
+
+  strong {
+    font-size: 120%;
+    color: @life;
+    .text-shadow(@life);
   }
 }
 
