@@ -29,7 +29,6 @@ window.Program = do ->
   resetInfo = (music) ->
     $(".info").addClass("hidden")
     $(".personal-high").removeClass("hidden")
-    $(".all-high-score").addClass("gone")
     $(".final-score").addClass("gone")
     $(".running-score").removeClass("hidden gone")
     $("div.audio").addClass("hidden") unless music
@@ -77,7 +76,7 @@ window.Program = do ->
 
   $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
-  getName = () ->
+  populateScoreTable = () ->
 
 
   class Snake
@@ -260,7 +259,8 @@ window.Program = do ->
       coord[0] < 0 or coord[0] >= @yDim or coord[1] < 0 or coord[1] >= @xDim
 
     gameOver: ->
-      rawTime = Math.floor((new Date().getTime() - @startTime.getTime()) / 1000)
+      @endTime = new Date()
+      rawTime = Math.floor((@endTime.getTime() - @startTime.getTime()) / 1000)
       minutes = Math.floor(rawTime / 60) + ":"
       seconds = if rawTime % 60 < 10 then "0" + rawTime % 60 else rawTime % 60
       @time = minutes + seconds
@@ -277,20 +277,24 @@ window.Program = do ->
         sfx.volume = song.volume
 
       clearInterval(handler)
-      @postHighScore()
-
-      window.game = null
+      if window.snakeUserName?
+        console.log(window.snakeUserName)
+        @postHighScore()
+        window.game = null
+      else
+        setTimeout ( -> 
+          $("form.user-name").removeClass("gone")
+          $(".shade").removeClass("gone")), 400
 
     postHighScore: ->
-      if window.snakeUserName?
-        id = Math.random().toString(36).slice(2)
-        userScoreRef = window.highScoreRef.child(id);
-        userScoreRef.setWithPriority({ 
-          name: window.snakeUserName, 
-          score:@score, 
-          time: @time}, 1/@score)
-      else
-        getName()
+      id = @endTime + " " + Math.random().toString(36).slice(2, 6)
+      userScoreRef = window.highScoreRef.child(id);
+      userScoreRef.setWithPriority({ 
+        name: window.snakeUserName, 
+        score: @score, 
+        time: @time}, 1/(1 + @score))
+      populateScoreTable()
+        
       
     toggleLiving: (event) ->
       node = event.target

@@ -14,6 +14,21 @@
   <script src="ninia.js"></script>
 </head>
 <body>
+  <div class="modal shade gone"></div>
+  <div class="modal all-high-score gone">
+    <h2>High Scores:</h2>
+    <table></table>
+  </div>
+
+  <form action="" class="user-name gone">
+    <h3>Nice job! <br>Want to add your name<br> to the leaderboard?</h3>
+    <input type="text" placeholder="Screen Name" value="">
+    <div>
+      <input type="submit" value="Save Name">
+      <input id="placebo" type="submit" value="Skip">
+    </div>
+  </form>
+
   <header class="wrap">
     <h1><span class="snake">Snake</span> / <span class="life">Life</span></h1>
     <h3 class="personal-high hidden">
@@ -26,11 +41,6 @@
       Final Score: <strong class="score"></strong>
     </h2>
     <button class="show-scores hidden">High Scores</button>
-    
-    <div class="all-high-score gone">
-      <h2>High Scores:</h2>
-      <table></table>
-    </div>
   </header>
 
   <section class="wrap">
@@ -157,18 +167,49 @@
   <script>
   $(function(){
     highScoreRef = new Firebase("https://snake-life.firebaseio.com//scoreList");
-    snakeUserName = "ethancd"
     var song = $(".song")[0];
     song.volume = 0.5;
 
+    var blink = function(){
+      $(".modal").addClass("gone");
+      $(".shade").off();
+    };
+
     $("html").on("keypress", function(event){
       if (event.keyCode == 13){
-        $("form").submit();
+        $("form.controls").submit();
       }
     })
 
-    $("form").on("submit", function(event){
+    $("button.show-scores").on("click", function(){
+      $(".modal").removeClass("gone");
+      $(".shade").on("click", function(){
+        blink();
+      })
+    })
+
+    $("form.user-name").on("keypress", function(event){
+      if (event.keyCode == 13) {
+        event.preventDefault();
+        $("form.user-name").submit();
+      }
+    });
+
+    $("form.user-name").on("submit", function(event){
       event.preventDefault();
+      $("form.user-name").addClass("gone");
+      $(".shade").addClass("gone");
+      snakeUserName = $("input[type=text]").val();
+      if (snakeUserName === ""){
+        snakeUserName = "Anonymous";
+      }
+      game.postHighScore();
+      game = null;
+    })
+
+    $("form.controls").on("submit", function(event){
+      event.preventDefault();
+      blink();
       var quality = $('input[name=quality]:checked').val();
       var size = $('input[name=size]:checked').val();
       var timeStep = $('input[name=timeStep]:checked').val();
