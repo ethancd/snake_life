@@ -1,5 +1,7 @@
 window.Program = do ->
 
+  highScoreRef = new Firebase("https://snake-life.firebaseio.com//scoreList")
+
   start = (size, timeStep, quality, music) ->
     game.gameOver() if game?
 
@@ -281,17 +283,17 @@ window.Program = do ->
 
       clearInterval(handler)
       if window.snakeUserName?
-        console.log(window.snakeUserName)
         @postHighScore()
         window.game = null
       else
         setTimeout ( -> 
           $("form.user-name").removeClass("gone")
+          $("form.user-name input[type=text]").focus()
           $(".shade").removeClass("gone")), 500
 
     postHighScore: ->
       id = @endTime + " " + Math.random().toString(36).slice(2, 6)
-      userScoreRef = window.highScoreRef.child(id);
+      userScoreRef = highScoreRef.child(id);
       userScoreRef.setWithPriority({ 
         name: window.snakeUserName, 
         score: @score, 

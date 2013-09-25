@@ -20,15 +20,6 @@
     <table></table>
   </div>
 
-  <form action="" class="user-name gone">
-    <h3>Nice job! <br>Want to add your name<br> to the leaderboard?</h3>
-    <input type="text" placeholder="Screen Name" value="">
-    <div>
-      <input type="submit" value="Save Name">
-      <input id="placebo" type="submit" value="Skip">
-    </div>
-  </form>
-
   <header class="wrap">
     <h1><span class="snake">Snake</span> / <span class="life">Life</span></h1>
     <h3 class="personal-high hidden">
@@ -44,6 +35,15 @@
   </header>
 
   <section class="wrap">
+    <form action="" class="user-name gone">
+      <h3>Nice job! <br>Want to add your name<br> to the leaderboard?</h3>
+      <input type="text" placeholder="Screen Name" value="">
+      <div>
+        <input type="submit" value="Save Name">
+        <input id="placebo" type="submit" value="Skip">
+      </div>
+    </form>
+    
     <form action="" class="controls info">
       <input type="submit" value="New Game">
 
@@ -166,7 +166,6 @@
   </section>
   <script>
   $(function(){
-    highScoreRef = new Firebase("https://snake-life.firebaseio.com//scoreList");
     var song = $(".song")[0];
     song.volume = 0.5;
 
