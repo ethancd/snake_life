@@ -27,7 +27,7 @@
     };
     playSong = function(timeStep) {
       var song;
-      $('div.audio').removeClass("hidden");
+      $("div.audio").removeClass("hidden");
       song = $(".song")[0];
       song.play();
       return song.currentTime = 0;

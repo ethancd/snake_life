@@ -21,7 +21,7 @@ window.Program = do ->
       , timeStep
 
   playSong = (timeStep) ->
-    $('div.audio').removeClass("hidden") 
+    $("div.audio").removeClass("hidden") 
     song = $(".song")[0]
     #song.webkitPreservesPitch = false #not functioning
     song.play()
