@@ -142,7 +142,7 @@
               }
               return _results;
             })(), name = _ref[0], score = _ref[1], size = _ref[2], speed = _ref[3], time = _ref[4];
-            if (name === "Anonymous" || __indexOf.call(names, name) < 0) {
+            if (__indexOf.call(names, name) < 0) {
               names.push(name);
               $table.append("<tr><td>" + i + ".<td>" + name + "<td>" + score + "<td>" + time);
               i += 1;

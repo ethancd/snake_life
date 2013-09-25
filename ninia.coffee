@@ -89,7 +89,7 @@ window.Program = do ->
       allScoresSnapshot.forEach (scoreSnapshot) ->
         if i <= 10
           [name, score, size, speed, time] = (val for key, val of scoreSnapshot.val())
-          if name is "Anonymous" or name not in names
+          if name not in names
             names.push(name)
             $table.append("<tr><td>#{i}.<td>#{name}<td>#{score}<td>#{time}")
             i += 1
