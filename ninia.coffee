@@ -82,13 +82,17 @@ window.Program = do ->
     $table = $("table.high-scores-table")
     $table.html("<tr><th>Rank<th>Name<th>Score<th>Time")
 
-    scoreView = highScoreRef.startAt().limit(10)
+    scoreView = highScoreRef.startAt()
     scoreView.once "value", (allScoresSnapshot) ->
       i = 1
+      names = []
       allScoresSnapshot.forEach (scoreSnapshot) ->
-        [name, score, size, speed, time] = (val for key, val of scoreSnapshot.val())
-        $table.append("<tr><td>#{i}.<td>#{name}<td>#{score}<td>#{time}")
-        i += 1
+        if i <= 10
+          [name, score, size, speed, time] = (val for key, val of scoreSnapshot.val())
+          if name is "Anonymous" or name not in names
+            names.push(name)
+            $table.append("<tr><td>#{i}.<td>#{name}<td>#{score}<td>#{time}")
+            i += 1
         return false
 
   class Snake
