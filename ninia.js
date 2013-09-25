@@ -444,7 +444,7 @@
           return setTimeout((function() {
             $("form.user-name").removeClass("gone");
             return $(".shade").removeClass("gone");
-          }), 400);
+          }), 500);
         }
       };
 

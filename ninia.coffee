@@ -77,7 +77,10 @@ window.Program = do ->
   $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
   populateScoreTable = () ->
-
+    #scoreView = window.highScoreRef.limit(10)
+    #console.log(scoreView)
+    #use .on("value") or something
+    #generate rows and stuff
 
   class Snake
     constructor: (@game, length) -> 
@@ -284,7 +287,7 @@ window.Program = do ->
       else
         setTimeout ( -> 
           $("form.user-name").removeClass("gone")
-          $(".shade").removeClass("gone")), 400
+          $(".shade").removeClass("gone")), 500
 
     postHighScore: ->
       id = @endTime + " " + Math.random().toString(36).slice(2, 6)
