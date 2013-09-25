@@ -78,11 +78,17 @@ window.Program = do ->
 
   $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
-  populateScoreTable = () ->
-    #scoreView = window.highScoreRef.limit(10)
-    #console.log(scoreView)
-    #use .on("value") or something
-    #generate rows and stuff
+  populateScoreTable = ->
+    $table = $("table.high-scores-table")
+    $table.html("<tr><th>Name<th>Score<th>Time")
+
+    scoreView = highScoreRef.startAt().limit(10)
+    scoreView.once "value", (allScoresSnapshot) ->
+      console.log(allScoresSnapshot.val())
+      allScoresSnapshot.forEach (scoreSnapshot) ->
+        [name, score, time] = (val for key, val of scoreSnapshot.val())
+        $table.append("<tr><td>#{name}<td>#{score}<td>#{time}")
+        return false
 
   class Snake
     constructor: (@game, length) -> 

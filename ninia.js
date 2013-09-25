@@ -118,7 +118,30 @@
     $find = function(coord) {
       return $("#row-" + coord[0] + "-col-" + coord[1]);
     };
-    populateScoreTable = function() {};
+    populateScoreTable = function() {
+      var $table, scoreView;
+      $table = $("table.high-scores-table");
+      $table.html("<tr><th>Name<th>Score<th>Time");
+      scoreView = highScoreRef.startAt().limit(10);
+      return scoreView.once("value", function(allScoresSnapshot) {
+        console.log(allScoresSnapshot.val());
+        return allScoresSnapshot.forEach(function(scoreSnapshot) {
+          var key, name, score, time, val, _ref;
+          _ref = (function() {
+            var _ref, _results;
+            _ref = scoreSnapshot.val();
+            _results = [];
+            for (key in _ref) {
+              val = _ref[key];
+              _results.push(val);
+            }
+            return _results;
+          })(), name = _ref[0], score = _ref[1], time = _ref[2];
+          $table.append("<tr><td>" + name + "<td>" + score + "<td>" + time);
+          return false;
+        });
+      });
+    };
     Snake = (function() {
       function Snake(game, length) {
         this.game = game;
