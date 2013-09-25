@@ -121,12 +121,13 @@
     populateScoreTable = function() {
       var $table, scoreView;
       $table = $("table.high-scores-table");
-      $table.html("<tr><th>Name<th>Score<th>Time");
+      $table.html("<tr><th>Rank<th>Name<th>Score<th>Time");
       scoreView = highScoreRef.startAt().limit(10);
       return scoreView.once("value", function(allScoresSnapshot) {
-        console.log(allScoresSnapshot.val());
+        var i;
+        i = 1;
         return allScoresSnapshot.forEach(function(scoreSnapshot) {
-          var key, name, score, time, val, _ref;
+          var key, name, score, size, speed, time, val, _ref;
           _ref = (function() {
             var _ref, _results;
             _ref = scoreSnapshot.val();
@@ -136,8 +137,9 @@
               _results.push(val);
             }
             return _results;
-          })(), name = _ref[0], score = _ref[1], time = _ref[2];
-          $table.append("<tr><td>" + name + "<td>" + score + "<td>" + time);
+          })(), name = _ref[0], score = _ref[1], size = _ref[2], speed = _ref[3], time = _ref[4];
+          $table.append("<tr><td>" + i + ".<td>" + name + "<td>" + score + "<td>" + time);
+          i += 1;
           return false;
         });
       });
@@ -479,7 +481,9 @@
         userScoreRef.setWithPriority({
           name: window.snakeUserName,
           score: this.score,
-          time: this.time
+          time: this.time,
+          size: this.xDim,
+          speed: this.timeStep
         }, 1 / (1 + this.score));
         return populateScoreTable();
       };

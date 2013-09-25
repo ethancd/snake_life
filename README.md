@@ -19,11 +19,10 @@ Technologies
 * CoffeeScript
 * CSS
 * LESS.js
+* Firebase
 
 TODO
 ====
 
-* Add high score chart
-* Reimplement element-grabbing / class-switching in native JS for a speed boost
 * Figure out what's up with the Firefox version?
 * Test in other browsers

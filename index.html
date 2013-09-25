@@ -15,15 +15,11 @@
 </head>
 <body>
   <div class="modal shade gone"></div>
-  <div class="modal all-high-score gone">
-    <h2>High Scores:</h2>
-    <table class="high-scores-table"></table>
-  </div>
 
   <header class="wrap">
     <h1><span class="snake">Snake</span> / <span class="life">Life</span></h1>
     <h3 class="personal-high hidden">
-      High Score: <strong class="high-score">0</strong>
+      Session: <strong class="high-score">0</strong>
     </h3>
     <h2 class="running-score hidden">
       Score: <strong class="score">0</strong><em class="potential"></em>
@@ -37,12 +33,15 @@
   <section class="wrap">
     <form action="" class="user-name gone">
       <h3>Nice job! <br>Want to add your name<br> to the leaderboard?</h3>
-      <input type="text" placeholder="Screen Name" value="">
-      <div>
-        <input type="submit" value="Save Name">
-        <input id="placebo" type="submit" value="Skip">
-      </div>
+      <input type="text" placeholder="Screen Name" maxlength="12" value="">
+      <input type="submit" value="Save Name">
+      <input id="placebo" type="submit" value="Skip">
     </form>
+
+    <div class="modal all-high-scores gone">
+      <h2>High Scores</h2>
+      <table class="high-scores-table"></table>
+    </div>
 
     <form action="" class="controls info">
       <input type="submit" value="New Game">

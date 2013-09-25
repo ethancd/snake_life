@@ -80,14 +80,15 @@ window.Program = do ->
 
   populateScoreTable = ->
     $table = $("table.high-scores-table")
-    $table.html("<tr><th>Name<th>Score<th>Time")
+    $table.html("<tr><th>Rank<th>Name<th>Score<th>Time")
 
     scoreView = highScoreRef.startAt().limit(10)
     scoreView.once "value", (allScoresSnapshot) ->
-      console.log(allScoresSnapshot.val())
+      i = 1
       allScoresSnapshot.forEach (scoreSnapshot) ->
-        [name, score, time] = (val for key, val of scoreSnapshot.val())
-        $table.append("<tr><td>#{name}<td>#{score}<td>#{time}")
+        [name, score, size, speed, time] = (val for key, val of scoreSnapshot.val())
+        $table.append("<tr><td>#{i}.<td>#{name}<td>#{score}<td>#{time}")
+        i += 1
         return false
 
   class Snake
@@ -303,7 +304,9 @@ window.Program = do ->
       userScoreRef.setWithPriority({ 
         name: window.snakeUserName, 
         score: @score, 
-        time: @time}, 1/(1 + @score))
+        time: @time,
+        size: @xDim,
+        speed: @timeStep}, 1/(1 + @score))
       populateScoreTable()
         
       
