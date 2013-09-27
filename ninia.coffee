@@ -348,9 +348,7 @@ window.Program = do ->
     getBonusCells: (cell) ->
       bonusCells = []
       cells = [cell]
-      i = 10
-      while cells.length > 0 and i > 0
-        i -= 1
+      while cells.length > 0
         cell = cells.shift()
         dirs = [
           [-1,-1], [-1, 0], [-1, 1],

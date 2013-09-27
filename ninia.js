@@ -543,12 +543,10 @@
       };
 
       Game.prototype.getBonusCells = function(cell) {
-        var bonusCells, c, cells, coords, dir, dirs, i, nabe, _i, _len, _ref;
+        var bonusCells, c, cells, coords, dir, dirs, nabe, _i, _len, _ref;
         bonusCells = [];
         cells = [cell];
-        i = 10;
-        while (cells.length > 0 && i > 0) {
-          i -= 1;
+        while (cells.length > 0) {
           cell = cells.shift();
           dirs = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
           for (_i = 0, _len = dirs.length; _i < _len; _i++) {
