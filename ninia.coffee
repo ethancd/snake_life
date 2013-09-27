@@ -197,7 +197,7 @@ window.Program = do ->
       @startTime = new Date()
       @xDim = @yDim = size
       @score = @potentialScore = @appleCount = @turnCount = 0
-      @scoreMod = Math.pow(Math.pow(20/size, 1.5) * (350/@timeStep), 1.1)
+      @scoreMod = Math.pow(Math.pow(20/size, 2.0) * (350/@timeStep), 1.1)
       @delay = length = Math.floor(size/3)
 
       @snake = new Snake @, length
@@ -319,13 +319,52 @@ window.Program = do ->
       cell = @getId(node)
 
       if @life.has(cell)
-        $(node).addClass("water");
-        $(node).removeClass("prelife living");
-        delete @life.list[cell.join()];
+        @kill(node, cell)
+
+        if event.shiftKey
+          cells = @getBonusCells(cell)
+          nodes = for new_cell in cells
+            $find(new_cell) 
+
+          @kill(nodes[i], cells[i]) for i in [0...nodes.length]
+          console.log(@scoreMod)
+          @score -= Math.floor(nodes.length * (10 + @appleCount) * @scoreMod)
+
       else
+        @vive(node, cell, event)
+
+    kill: (node, cell) ->
+      if @life.has(cell)
+        $(node).addClass("water")
+        $(node).removeClass("prelife living")
+        delete @life.list[cell.join()]
+
+    vive: (node, cell, event) ->
+      unless @life.has(cell)
         $(node).addClass("prelife")
         setTimeout ( -> $(node).addClass("living")), 1, event
         @life.list[cell.join()] = true
+
+    getBonusCells: (cell) ->
+      bonusCells = []
+      cells = [cell]
+      i = 10
+      while cells.length > 0 and i > 0
+        i -= 1
+        cell = cells.shift()
+        for dir in [[-1,0], [1,0], [0,1], [0,-1]]
+          nabe = [dir[0] + cell[0], dir[1] + cell[1]]
+          coords = for c in bonusCells
+            c.join(",")
+
+          if nabe.join(",") not in coords and @life.has(nabe)
+            cells.push(nabe)
+            bonusCells.push(nabe)
+
+      bonusCells
+
+
+
 
     getId: (target) ->
       [parseInt($(target).attr("id").split("-")[1]),

@@ -353,7 +353,7 @@
         this.startTime = new Date();
         this.xDim = this.yDim = size;
         this.score = this.potentialScore = this.appleCount = this.turnCount = 0;
-        this.scoreMod = Math.pow(Math.pow(20 / size, 1.5) * (350 / this.timeStep), 1.1);
+        this.scoreMod = Math.pow(Math.pow(20 / size, 2.0) * (350 / this.timeStep), 1.1);
         this.delay = length = Math.floor(size / 3);
         this.snake = new Snake(this, length);
         this.life = new Life(this);
@@ -497,20 +497,79 @@
       };
 
       Game.prototype.toggleLiving = function(event) {
-        var cell, node;
+        var cell, cells, i, new_cell, node, nodes, _i, _ref;
         node = event.target;
         cell = this.getId(node);
+        if (this.life.has(cell)) {
+          this.kill(node, cell);
+          if (event.shiftKey) {
+            cells = this.getBonusCells(cell);
+            nodes = (function() {
+              var _i, _len, _results;
+              _results = [];
+              for (_i = 0, _len = cells.length; _i < _len; _i++) {
+                new_cell = cells[_i];
+                _results.push($find(new_cell));
+              }
+              return _results;
+            })();
+            for (i = _i = 0, _ref = nodes.length; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+              this.kill(nodes[i], cells[i]);
+            }
+            console.log(this.scoreMod);
+            return this.score -= Math.floor(nodes.length * (10 + this.appleCount) * this.scoreMod);
+          }
+        } else {
+          return this.vive(node, cell, event);
+        }
+      };
+
+      Game.prototype.kill = function(node, cell) {
         if (this.life.has(cell)) {
           $(node).addClass("water");
           $(node).removeClass("prelife living");
           return delete this.life.list[cell.join()];
-        } else {
+        }
+      };
+
+      Game.prototype.vive = function(node, cell, event) {
+        if (!this.life.has(cell)) {
           $(node).addClass("prelife");
           setTimeout((function() {
             return $(node).addClass("living");
           }), 1, event);
           return this.life.list[cell.join()] = true;
         }
+      };
+
+      Game.prototype.getBonusCells = function(cell) {
+        var bonusCells, c, cells, coords, dir, i, nabe, _i, _len, _ref, _ref1;
+        bonusCells = [];
+        cells = [cell];
+        i = 10;
+        while (cells.length > 0 && i > 0) {
+          i -= 1;
+          cell = cells.shift();
+          _ref = [[-1, 0], [1, 0], [0, 1], [0, -1]];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            dir = _ref[_i];
+            nabe = [dir[0] + cell[0], dir[1] + cell[1]];
+            coords = (function() {
+              var _j, _len1, _results;
+              _results = [];
+              for (_j = 0, _len1 = bonusCells.length; _j < _len1; _j++) {
+                c = bonusCells[_j];
+                _results.push(c.join(","));
+              }
+              return _results;
+            })();
+            if ((_ref1 = nabe.join(","), __indexOf.call(coords, _ref1) < 0) && this.life.has(nabe)) {
+              cells.push(nabe);
+              bonusCells.push(nabe);
+            }
+          }
+        }
+        return bonusCells;
       };
 
       Game.prototype.getId = function(target) {

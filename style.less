@@ -4,6 +4,7 @@
 @life: #f00;
 @snake: #00b800;
 @water: #00f;
+@ice: #0ff;
 
 @faded: 0.5;
 @snake-fade: 1000ms;
@@ -260,6 +261,22 @@ article {
     .text-shadow(@fore, 1px);
     margin-bottom: 20px;
 
+    strong {
+      &.snake {
+        color: @snake;
+        .text-shadow(@snake, 1px);
+      }
+      &.life {
+        color: @life;
+        .text-shadow(@life, 1px);
+      }
+
+      &.water {
+        color: @ice;
+        .text-shadow(@ice, 1px);
+      }
+    }
+
     li {
       margin-left: 20px;
     }
@@ -301,6 +318,12 @@ ul {
     border-radius: 5px;
     opacity: 0;
 
+    &:hover {
+      border: 1px solid @life;
+      width: 28px;
+      height: 28px;
+      opacity: 1;
+    }
 
     &.apple, &.water, &.presnake, &.prelife {
       opacity: 1;
@@ -311,6 +334,10 @@ ul {
       background-position: 2px 0px;
       background-size: auto 30px;
       background-repeat: no-repeat;
+
+      &:hover {
+        background-position: 1px -1px;
+      }
     }
 
     &.snake {
@@ -321,6 +348,10 @@ ul {
     &.living {
       .fader(@life-fade, @faded, ease-out);
       .box-shadow(@life, 80px);
+
+      &:hover {
+        border: 1px solid @ice;
+      }
     }
 
     &.water {
