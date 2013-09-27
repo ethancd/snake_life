@@ -492,7 +492,7 @@
           time: this.time,
           size: this.xDim,
           speed: this.timeStep
-        }, 1 / (1 + this.score));
+        }, Math.abs(1 / (1 + this.score)));
         return populateScoreTable();
       };
 

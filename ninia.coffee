@@ -310,7 +310,7 @@ window.Program = do ->
         score: @score, 
         time: @time,
         size: @xDim,
-        speed: @timeStep}, 1/(1 + @score))
+        speed: @timeStep}, Math.abs(1/(1 + @score)))
       populateScoreTable()
         
       
