@@ -543,16 +543,16 @@
       };
 
       Game.prototype.getBonusCells = function(cell) {
-        var bonusCells, c, cells, coords, dir, i, nabe, _i, _len, _ref, _ref1;
+        var bonusCells, c, cells, coords, dir, dirs, i, nabe, _i, _len, _ref;
         bonusCells = [];
         cells = [cell];
         i = 10;
         while (cells.length > 0 && i > 0) {
           i -= 1;
           cell = cells.shift();
-          _ref = [[-1, 0], [1, 0], [0, 1], [0, -1]];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            dir = _ref[_i];
+          dirs = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
+          for (_i = 0, _len = dirs.length; _i < _len; _i++) {
+            dir = dirs[_i];
             nabe = [dir[0] + cell[0], dir[1] + cell[1]];
             coords = (function() {
               var _j, _len1, _results;
@@ -563,7 +563,7 @@
               }
               return _results;
             })();
-            if ((_ref1 = nabe.join(","), __indexOf.call(coords, _ref1) < 0) && this.life.has(nabe)) {
+            if ((_ref = nabe.join(","), __indexOf.call(coords, _ref) < 0) && this.life.has(nabe)) {
               cells.push(nabe);
               bonusCells.push(nabe);
             }

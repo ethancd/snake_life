@@ -352,7 +352,12 @@ window.Program = do ->
       while cells.length > 0 and i > 0
         i -= 1
         cell = cells.shift()
-        for dir in [[-1,0], [1,0], [0,1], [0,-1]]
+        dirs = [
+          [-1,-1], [-1, 0], [-1, 1],
+          [ 0,-1],          [ 0, 1],
+          [ 1,-1], [ 1, 0], [ 1, 1]
+        ]
+        for dir in dirs
           nabe = [dir[0] + cell[0], dir[1] + cell[1]]
           coords = for c in bonusCells
             c.join(",")
