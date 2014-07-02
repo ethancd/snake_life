@@ -1,7 +1,5 @@
 window.Program = do ->
 
-  highScoreRef = new Firebase("https://snake-life.firebaseio.com//scoreList")
-
   start = (size, timeStep, quality, music) ->
     game.gameOver() if game?
 
@@ -23,9 +21,7 @@ window.Program = do ->
   playSong = (timeStep) ->
     $("div.audio").removeClass("hidden") 
     song = $(".song")[0]
-    #song.webkitPreservesPitch = false #not functioning
     song.play()
-    #song.playbackRate = 300 / timeStep #not sure if good idea
     song.currentTime = 0
 
   resetInfo = (music) ->
@@ -78,23 +74,6 @@ window.Program = do ->
 
   $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
-  populateScoreTable = ->
-    $table = $("table.high-scores-table")
-    $table.html("<tr><th>Rank<th>Name<th>Score<th>Time")
-
-    scoreView = highScoreRef.startAt()
-    scoreView.once "value", (allScoresSnapshot) ->
-      i = 1
-      names = []
-      allScoresSnapshot.forEach (scoreSnapshot) ->
-        if i <= 10
-          [name, score, size, speed, time] = (val for key, val of scoreSnapshot.val())
-          if name not in names
-            names.push(name)
-            $table.append("<tr><td>#{i}.<td>#{name}<td>#{score}<td>#{time}")
-            i += 1
-        return false
-
   class Snake
     constructor: (@game, length) -> 
       @dir = [0,1]
@@ -118,14 +97,23 @@ window.Program = do ->
       (return true if coord.join() is part.join()) for part in @body
       return false
 
-    findNext: -> [@body[0][0] + @nextDir[0], @body[0][1] + @nextDir[1]]
+    findNext: -> 
+      next = [@body[0][0] + @nextDir[0], @body[0][1] + @nextDir[1]]
+      if @game.offscreen(next)
+        next = (@wrap(value) for value in next)
+      next
+
+    wrap: (value) ->
+      if value < 0 then @game.yDim - 1 
+      else if value >= @game.yDim then 0
+      else value
 
     update: ->
       next = do @findNext
       if @game.apple? and next.join() is @game.apple.join()
         $find(next).removeClass("apple")
         do @game.addApple 
-      else if @game.offscreen(next) or @has(next) or @game.life.has(next)
+      else if  @has(next) or @game.life.has(next)
         do @game.gameOver 
       else
         @game.life.list[@body.pop().join()] = true
@@ -294,26 +282,13 @@ window.Program = do ->
 
       clearInterval(handler)
       if window.snakeUserName?
-        @postHighScore()
         window.game = null
       else
         setTimeout ( -> 
           $("form.user-name").removeClass("gone")
           $("form.user-name input[type=text]").focus()
           $(".shade").removeClass("gone")), 500
-
-    postHighScore: ->
-      id = @endTime + " " + Math.random().toString(36).slice(2, 6)
-      userScoreRef = highScoreRef.child(id);
-      userScoreRef.setWithPriority({ 
-        name: window.snakeUserName, 
-        score: @score, 
-        time: @time,
-        size: @xDim,
-        speed: @timeStep}, Math.abs(1/(1 + @score)))
-      populateScoreTable()
-        
-      
+              
     toggleLiving: (event) ->
       node = event.target
       cell = @getId(node)
@@ -329,9 +304,6 @@ window.Program = do ->
           @kill(nodes[i], cells[i]) for i in [0...nodes.length]
           console.log(@scoreMod)
           @score -= Math.floor(nodes.length * (10 + @appleCount) * @scoreMod)
-
-      else
-        @vive(node, cell, event)
 
     kill: (node, cell) ->
       if @life.has(cell)
