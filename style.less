@@ -1,15 +1,13 @@
-@back: #000;
-@gray: #1d1d1d;
-@fore: #fff;
+@back: #fff;
+@gray: #fafafa;
+@fore: #666;
 @life: #f00;
 @snake: #00b800;
 @water: #00f;
 @ice: #0ff;
 
-@faded: 0.5;
-@snake-fade: 1000ms;
 @life-fade: 500ms;
-@game-size: 600px;
+@game-size: 480px;
 @game-margin: 20px;
 @wrap-width: 1000px;
 
@@ -117,193 +115,9 @@ header {
   }
 }
 
-.modal {
-  position: absolute;
-  z-index: 10;
-
-  &.shade {
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(100, 100, 100, 0.5);
-  }
-
-  &.all-high-scores {
-    top: 61px;
-    left: 185px;
-    width: 480px;
-    height: 480px;
-    background-color: @back;
-    border-radius: 20px;
-
-    h2 {
-      margin: 20px 0px;
-      font-size: 200%;
-      text-align: center;
-    }
-
-    table {
-      font-size: 130%;
-      margin: 20px auto;
-
-      tr {
-        th {
-          padding: 5px 20px;
-          text-align: right;
-
-          &:nth-child(2) {
-            text-align: left;
-          }
-        }
-
-        td {
-          padding: 5px 20px;
-          text-align: right;
-
-          &:nth-child(2) {
-            text-align: left;
-          }
-          &:nth-child(3) {
-            color: @life;
-          }
-          &:nth-child(4) {
-            color: @snake;
-          }
-        }
-      }
-    }
-  }
-}
-
-.info {
-  .fader;
-}
-
-form.user-name {
-  position: absolute;
-  z-index: 20;
-
-  top: 61px;
-  left: 185px;
-  width: 480px;
-  height: 210px;
-  border-radius: 20px;
-  background-color: @gray;
-
-  h3 {
-    text-align: center;
-    font-size: 150%;
-    color: fore;
-    margin-top: 20px;
-  }
-
-  input[type="text"] {
-    display: block;
-    width: 100px;
-    margin: 10px auto;
-  }
-
-  input[type="submit"]{
-    display: block;
-    color: @gray;
-    padding: 0px 4px;
-    margin: 5px auto;
-    .box-shadow(@snake);
-    border-radius: 5px;
-    cursor: pointer;
-
-    &#placebo {
-      .box-shadow(@life);
-    }
-  }
-}
-
-form.controls {
-  float: left;
-  .text-shadow(@fore, 1px);
-
-  div {
-    margin: 10px 0px;
-  }
-
-  img {
-    position: relative;
-    width: 20px;
-    height: auto;
-    top: 8px;
-  }
-
-  input[type="radio"]{
-    margin-right: 3px;
-  }
-
-  input[type="submit"]{
-    color: @gray;
-    padding: 0px 4px;
-    .box-shadow(@life);
-    border-radius: 5px;
-    cursor: pointer;
-
-    &:hover, &:focus {
-      outline: none;
-      .box-shadow(@snake);
-    }
-  }
-}
-
-article {
-  width: 245px;
-  float: right;
-  text-align: justify;
-
-  .instructions {
-    font-size: 100%;
-    .text-shadow(@fore, 1px);
-    margin-bottom: 20px;
-
-    strong {
-      &.snake {
-        color: @snake;
-        .text-shadow(@snake, 1px);
-      }
-      &.life {
-        color: @life;
-        .text-shadow(@life, 1px);
-      }
-
-      &.water {
-        color: @ice;
-        .text-shadow(@ice, 1px);
-      }
-    }
-
-    li {
-      margin-left: 20px;
-    }
-  }
-
-  div.audio {
-    margin-left: -15px;
-    .fader;
-
-    a {
-      display: block;
-      width: 280px;
-      margin-top: 2px;
-      padding-left: 15px;
-      text-align: left;
-      text-decoration: none;
-      color: #fff;
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-}
-
 ul {
-  float: left;
-  margin: 0px @game-margin;
+  margin: -50px auto 0 auto;
+  left: 100px;
   list-style: none;
   background-color: @back;
   border: 1px solid @snake;
@@ -325,7 +139,7 @@ ul {
       opacity: 1;
     }
 
-    &.apple, &.water, &.presnake, &.prelife {
+    &.apple, &.water {
       opacity: 1;
     }
 
@@ -341,13 +155,11 @@ ul {
     }
 
     &.snake {
-      .fader(@snake-fade, @faded);
-      .box-shadow(@snake);
+      background-color: @snake;
     }
 
     &.living {
-      .fader(@life-fade, @faded, ease-out);
-      .box-shadow(@life, 80px);
+      background-color: @life;
 
       &:hover {
         border: 1px solid @ice;

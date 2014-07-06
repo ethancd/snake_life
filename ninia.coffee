@@ -1,61 +1,25 @@
 window.Program = do ->
 
-  start = (size, timeStep, quality, music) ->
+  start = ->
     game.gameOver() if game?
 
-    resetInfo(music)
-    populateBoard(size)
-    modifyStyle(size, timeStep, quality)
-    playSong(timeStep) if (music) 
-
-    window.game = new Game(timeStep, size, music)
+    resetInfo()
+    populateBoard(16)
+    window.game = new Game(16)
 
     bindMouse(game)
     bindKeys(game)
 
-    window.handler = setInterval ->
-        game.update()
-        game.render() if game?
-      , timeStep
-
-  playSong = (timeStep) ->
-    $("div.audio").removeClass("hidden") 
-    song = $(".song")[0]
-    song.play()
-    song.currentTime = 0
-
   resetInfo = (music) ->
-    $(".info").addClass("hidden")
-    $(".personal-high").removeClass("hidden")
-    $(".final-score").addClass("gone")
     $(".running-score").removeClass("hidden gone")
-    $("div.audio").addClass("hidden") unless music
 
   populateBoard = (size) ->
-    $("ul").html("")
+    $board = $("#board");
+    $board.html("")
+
     for i in [0...size]
       for j in [0...size]
-        $("ul").append("<li id='row-#{i}-col-#{j}'></li>")
-
-  setQuality = (quality) -> 
-    switch quality
-      when "fancy" then {"@faded": "0.5"}
-      when "less_fancy" then {"@faded": "1"}
-      when "plain"
-        $("li").addClass("no-box-shadow")
-        {"@faded": "1"}
-
-  setLayout = (size, timeStep) ->
-    {
-      '@snake-fade': timeStep * Math.floor(size/2) + "ms",
-      '@life-fade': timeStep * 30 + "ms",
-      '@game-size': size * 30 + "px",
-      '@game-margin': _.max([20, (640 - size*30)/2]) + "px",
-      '@wrap-width': if size <= 20 then "1000px" else size * 30 + 400 + "px"
-    }
-
-  modifyStyle = (size, timeStep, quality) ->
-    window.less.modifyVars($.extend(setLayout(size, timeStep), setQuality(quality)))
+        $board.append("<li id='row-#{i}-col-#{j}'></li>")
 
   bindMouse = (game) ->
     $("html").on "mousedown", (event) ->
@@ -71,6 +35,7 @@ window.Program = do ->
           when 37, 65 then do game.snake.west
           when 40, 83 then do game.snake.south
           when 39, 68 then do game.snake.east
+          when 32 then do game.toggleTime
 
   $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
@@ -81,42 +46,53 @@ window.Program = do ->
       @buildBody(length)
 
     buildBody: (length) ->
-      startY = Math.floor(0.75 * @game.yDim)
-      startX = Math.floor(0.5  * @game.xDim)
+      startY = 12
+      startX = 6
 
       i = -1 
       @body = while (i++ < length)
         [startY, startX - i]
 
-    north: -> @nextDir = [-1, 0] if @dir[0] isnt  1
-    south: -> @nextDir = [ 1, 0] if @dir[0] isnt -1
-    east:  -> @nextDir = [ 0, 1] if @dir[1] isnt -1
-    west:  -> @nextDir = [ 0,-1] if @dir[1] isnt  1
+    north: ->
+      if @dir[0] isnt 1
+        @nextDir = [-1, 0]
+        do @game.timelessUpdate
+
+    south: -> 
+      if @dir[0] isnt -1
+        @nextDir = [ 1, 0]
+        do @game.timelessUpdate
+
+    east: -> 
+      if @dir[1] isnt -1
+        @nextDir = [ 0, 1] 
+        do @game.timelessUpdate
+
+    west: -> 
+      if @dir[1] isnt 1
+        @nextDir = [ 0,-1] 
+        do @game.timelessUpdate
 
     has: (coord) -> 
       (return true if coord.join() is part.join()) for part in @body
+
       return false
 
-    findNext: -> 
-      next = [@body[0][0] + @nextDir[0], @body[0][1] + @nextDir[1]]
-      if @game.offscreen(next)
-        next = (@wrap(value) for value in next)
-      next
-
-    wrap: (value) ->
-      if value < 0 then @game.yDim - 1 
-      else if value >= @game.yDim then 0
-      else value
+    getNext: -> 
+      [@game.wrap(@body[0][0] + @nextDir[0]), @game.wrap(@body[0][1] + @nextDir[1])]
 
     update: ->
-      next = do @findNext
+      next = do @getNext
+
       if @game.apple? and next.join() is @game.apple.join()
         $find(next).removeClass("apple")
         do @game.addApple 
-      else if  @has(next) or @game.life.has(next)
+
+      if @has(next) or @game.life.has(next)
         do @game.gameOver 
       else
         @game.life.list[@body.pop().join()] = true
+
       @dir = @nextDir
       @body.unshift(next)
 
@@ -126,45 +102,30 @@ window.Program = do ->
       @list = {}
       @activeCells = 5
 
-      rPentomino = [[-2, 0], [-2, 1], [-1, 0], [0, 0], [-1, -1]]
+      @rPentomino = [[-2, 0], [-2, 1], [-1, 0], [0, 0], [-1, -1]]
 
-      cells = for shift in rPentomino 
+      cells = for shift in @rPentomino 
         do (shift) ->
-          [shift[0] + Math.floor(self.game.yDim/2),
-           shift[1] + Math.floor(self.game.xDim/2)]
+          [shift[0] + 8,
+           shift[1] + 8]
 
       @list[cell.join()] = true for cell in cells
-      do @generateCorners
 
-      $.extend(@list, @corners)
-
-    generateCorners: ->
-      offset = _.max([Math.floor(@game.xDim/4) - 3, 0])
-      @corners = {}
-      [y, x] = [@game.yDim - 1, @game.xDim - 1]
-
-      yArray = [offset, offset + 1, y - offset, y - offset - 1]
-      xArray = [offset, offset + 1, x - offset, x - offset - 1]
-
-      cells = [].concat((for x in xArray 
-        do (x) ->
-          [y, x] for y in yArray)...)
-
-      @corners[cell.join()] = true for cell in cells
-      
+      @list
+   
     update: ->
       @list = do @detectionSweep
-      @activeCells = (_.size(@list) - _.size(@corners))
+      @activeCells = _.size(@list) 
 
     detectionSweep: ->
       tempList = {}
-      for i in [0...@game.yDim]
-        for j in [0...@game.xDim]
+      for i in [0...@game.size]
+        for j in [0...@game.size]
           census = @countLiving([i,j])
           if census is 3 or (census is 2 and @has([i,j]))
             tempList[[i,j].join()] = true
 
-      $.extend(tempList, @corners)
+      tempList
 
     countLiving: (cell) -> 
       (nabe for nabe in @neighbors(cell) when @has(nabe)).length
@@ -176,50 +137,49 @@ window.Program = do ->
         [ 1,-1], [ 1, 0], [ 1, 1]
       ]
 
-      [unit[0] + cell[0], unit[1] + cell[1]] for unit in units
+      [@game.wrap(unit[0] + cell[0]), @game.wrap(unit[1] + cell[1])] for unit in units
 
-    has: (coord) -> @list[coord.join()]
+    has: (coord) -> 
+      @list[coord.join()]
 
   class Game
-    constructor: (@timeStep, size, @music) ->
-      @startTime = new Date()
-      @xDim = @yDim = size
-      @score = @potentialScore = @appleCount = @turnCount = 0
-      @scoreMod = Math.pow(Math.pow(20/size, 2.0) * (350/@timeStep), 1.1)
-      @delay = length = Math.floor(size/3)
+    constructor: (@size) ->
+      @score = @appleCount = @framesPerMinute = 1
+      @timeless = true
+      @$cells = $('li')
 
-      @snake = new Snake @, length
-      @life = new Life @
+      @snake = new Snake(@, 5)
+      @life = new Life(@)
 
       do @addApple
 
+    toggleTime: ->
+      @timeless = not @timeless
+
+      @rampUpRunning unless @timeless
+
+    timelessUpdate: ->
+      if @timeless then do @update
+
+    rampUpRunning: ->
+      #get game speed back up to "actual" fPM without being jarring
+
     update: ->
-      if @turnCount > @delay
-        do @life.update
-        do @render
-      else
-        @life.activeCells = ($('.living').length - _.size(@life.corners))
-
+      do @life.update
+      do @render
       do @snake.update
-      @turnCount += 1
-      @score += do @stepUpScore
 
-    stepUpScore: -> Math.ceil(Math.log(
-        @turnCount * @life.activeCells * @scoreMod / 500 + 1))
+      @turnCount += 1
 
     render: ->
-      @potentialScore = do @calculatePotentialScore
       $(".score").html(" " + @score)
-      $(".potential").html(" + " + @potentialScore)
-      high = parseInt($(".high-score").html())
-      $(".high-score").html(" " + @score) if @score > high
       do @updateClass
 
     addApple: ->
       loop
         coord = [
-          Math.floor(Math.random()*@yDim), 
-          Math.floor(Math.random()*@xDim)
+          Math.floor(Math.random() * @size), 
+          Math.floor(Math.random() * @size)
         ]
 
         unless (@apple? and @apple.join() is coord.join()) or
@@ -228,118 +188,55 @@ window.Program = do ->
           break
 
       @appleCount += 1
-      @score += @potentialScore
+      @score += do @getAddedScore
       @apple = coord
       $find(@apple).addClass("apple")
 
-    calculatePotentialScore: -> _.max([0, Math.floor(
-        (10 + @appleCount) * (@life.activeCells - 1) * @scoreMod)])
+    getAddedScore: -> 
+      _.max([0, Math.floor((@appleCount) * _.max(1, Math.pow(@getTimeModifier(), 2)))])
+
+
+    getTimeModifier: ->
+      if @timeless then 0 else @framesPerMinute
 
     updateClass: ->
-      $cells = $("li")      
-      $cells.removeClass("water")
+      @$cells.removeClass("water")
 
-      for cell in $cells
+      for cell in @$cells
         cellArr = cell.id.split("-")
         coord = [parseInt(cellArr[1]), parseInt(cellArr[3])]
 
         if @snake.has(coord)
-          if cell.className.indexOf("presnake") is -1
-            cell.className += " presnake"
-            ((cell) -> setTimeout ( -> cell.className += " snake"), 1)(cell)
-        else
-          cell.className = cell.className.replace( /(?:^|\s)presnake(?!\S)/ , '' )
-          cell.className = cell.className.replace( /(?:^|\s)snake(?!\S)/ , '' )
+          $(cell).addClass("snake")
 
         if @life.has(coord)
-          if cell.className.indexOf("prelife") is -1
-            cell.className += " prelife"
-            ((cell) -> setTimeout ( -> cell.className += " living"), 1)(cell)
-        else
-          cell.className = cell.className.replace( /(?:^|\s)prelife(?!\S)/ , '' )
-          cell.className = cell.className.replace( /(?:^|\s)living(?!\S)/ , '' )
-
-    offscreen: (coord) ->
-      coord[0] < 0 or coord[0] >= @yDim or coord[1] < 0 or coord[1] >= @xDim
+          $(cell).addClass("living")
 
     gameOver: ->
-      @endTime = new Date()
-      rawTime = Math.floor((@endTime.getTime() - @startTime.getTime()) / 1000)
-      minutes = Math.floor(rawTime / 60) + ":"
-      seconds = if rawTime % 60 < 10 then "0" + rawTime % 60 else rawTime % 60
-      @time = minutes + seconds
       $(".running-score").addClass("gone")
-      $(".final-score").removeClass("gone")
-      $(".info").removeClass("hidden")
-      $("button.show-scores").removeClass("hidden")
       $("html").off("mousedown").off("keydown")
 
-      if game.music
-        [song, sfx] = $("audio").get()
-        song.pause()
-        sfx.play()
-        sfx.volume = song.volume
-
       clearInterval(handler)
-      if window.snakeUserName?
-        window.game = null
-      else
-        setTimeout ( -> 
-          $("form.user-name").removeClass("gone")
-          $("form.user-name input[type=text]").focus()
-          $(".shade").removeClass("gone")), 500
-              
+      window.game = null
+     
     toggleLiving: (event) ->
       node = event.target
       cell = @getId(node)
 
       if @life.has(cell)
-        @kill(node, cell)
-
-        if event.shiftKey
-          cells = @getBonusCells(cell)
-          nodes = for new_cell in cells
-            $find(new_cell) 
-
-          @kill(nodes[i], cells[i]) for i in [0...nodes.length]
-          console.log(@scoreMod)
-          @score -= Math.floor(nodes.length * (10 + @appleCount) * @scoreMod)
-
+        @kill(node, cell) 
+        @timelessUpdate
+        
     kill: (node, cell) ->
       if @life.has(cell)
         $(node).addClass("water")
-        $(node).removeClass("prelife living")
+        $(node).removeClass("living")
         delete @life.list[cell.join()]
 
-    vive: (node, cell, event) ->
-      unless @life.has(cell)
-        $(node).addClass("prelife")
-        setTimeout ( -> $(node).addClass("living")), 1, event
-        @life.list[cell.join()] = true
-
-    getBonusCells: (cell) ->
-      bonusCells = []
-      cells = [cell]
-      while cells.length > 0
-        cell = cells.shift()
-        dirs = [
-          [-1,-1], [-1, 0], [-1, 1],
-          [ 0,-1],          [ 0, 1],
-          [ 1,-1], [ 1, 0], [ 1, 1]
-        ]
-        for dir in dirs
-          nabe = [dir[0] + cell[0], dir[1] + cell[1]]
-          coords = for c in bonusCells
-            c.join(",")
-
-          if nabe.join(",") not in coords and @life.has(nabe)
-            cells.push(nabe)
-            bonusCells.push(nabe)
-
-      bonusCells
-
-
-
+    wrap: (value) ->
+      if value < 0 then @size - 1 
+      else if value >= @size then 0
+      else value
 
     getId: (target) ->
       [parseInt($(target).attr("id").split("-")[1]),

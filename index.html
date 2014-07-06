@@ -15,214 +15,33 @@
 <body>
   <div class="modal shade gone"></div>
 
-  <header class="wrap">
-    <h1><strong class="snake">Snake</strong> / <strong class="life">Life</strong></h1>
-    <h3 class="personal-high hidden">
-      Session: <strong class="high-score">0</strong>
-    </h3>
-    <h2 class="running-score hidden">
-      Score: <strong class="score">0</strong><em class="potential"></em>
-    </h2>
-    <h2 class="final-score gone">
-      Final Score: <strong class="score"></strong>
-    </h2>
-    <button class="show-scores hidden">High Scores</button>
-  </header>
+    <header class="wrap">
+      <h1><strong class="snake">Snake</strong> / <strong class="life">Life</strong></h1>
+      <h2 class="running-score hidden">
+        Score: <strong class="score">0</strong><em class="potential"></em>
+      </h2>
+    </header>
 
   <section class="wrap">
-    <form action="" class="user-name gone">
-      <h3>Nice job! <br>Want to add your name<br> to the leaderboard?</h3>
-      <input type="text" placeholder="Screen Name" maxlength="12" value="">
-      <input type="submit" value="Save Name">
-      <input id="placebo" type="submit" value="Skip">
-    </form>
-
-    <div class="modal all-high-scores gone">
-      <h2>High Scores</h2>
-      <table class="high-scores-table"></table>
-    </div>
-
-    <form action="" class="controls info">
+    <form action="" id="new-game">
       <input type="submit" value="New Game">
-
-      <div>
-        <label>
-          <input type="radio" name="size" value="12">
-          Teensy
-        </label><br>
-        <label>
-          <input type="radio" name="size" value="16">
-          Cramped
-        </label><br>
-        <label>
-          <input type="radio" name="size" value="20" checked>
-          Normal
-        </label><br>
-        <label>
-          <input type="radio" name="size" value="28">
-          Large
-        </label>
-      </div>
-
-      <div>
-        <label>
-          <input type="radio" name="timeStep" value="600">
-          Claymation
-        </label><br>
-        <label>
-          <input type="radio" name="timeStep" value="400">
-          Slow
-        </label><br>
-        <label>
-          <input type="radio" name="timeStep" value="250" checked>
-          Medium
-        </label><br>
-        <label>
-          <input type="radio" name="timeStep" value="175">
-          Blazing
-        </label><br>
-        <label>
-          <input type="radio" name="timeStep" value="100">
-          Ludicrous
-        </label>
-      </div>
-
-      <div>
-        <label>
-          <input type="radio" name="quality" value="fancy" checked>
-          Fancy
-        </label><br>
-        <label>
-          <input type="radio" name="quality" value="less_fancy">
-          Less Fancy
-        </label><br>
-        <label>
-          <input type="radio" name="quality" value="plain">
-          Plain
-        </label>
-      </div>
-
-      <div>
-        <label>
-          <input type="radio" name="music" value="true">
-          Music<img src="images/speaker_three.png">
-        </label>
-        <br>
-        <label>
-          <input type="radio" name="music" value="false" checked>
-          Mute<img src="images/speaker_none.png">
-        </label>
-      </div>
     </form>
 
-    <ul></ul>
-
-    <article>
-      <p class="instructions info">
-        Use the <strong class="snake">arrow keys</strong> or 
-        <strong class="snake">WASD keys</strong> to move your snake 
-        around the board collecting apples, while being careful to avoid walls, 
-        the snake body, or the fire of life raging around you. 
-        You can also <strong class="life">click and drag</strong> your mouse 
-        through spaces to toggle whether they're alive, 
-        or hold <strong class="water">shift and click</strong> to remove
-        an entire contiguous block (at the price of a small number of points).
-      </p>
-      <p class="instructions info">
-        You score more points the longer you stay alive, and get a bonus based on 
-        how many tiles are currently alive every time you eat an apple. Also, the 
-        faster the speed and smaller the board, the more points you get! 
-      </p>
-      <p class="instructions info">
-        If the game performance starts to lag, I've found the following to help:
-      </p>
-      <ol class="instructions info">
-        <li>Use the Chrome browser</li>
-        <li>Lower the Quality</li>
-        <li>Lower the Speed</li>
-        <li>Lower the Map Size</li>
-      </ol>
-      <p class="instructions info">
-        Press Enter to start a new game with current settings.
-      </p>
-
-      <div class="audio hidden">
-        <audio controls loop class="song">
-          <source src="audio/dan143.mp3" type="audio/mpeg">
-          <source src="audio/dan143.ogg" type="audio/ogg">
-          Your browser does not support this audio format.
-        </audio>
-        <a href="http://danbartonmusic.com/">
-          &quot;Massive Pixel Attack&quot; by Dan Barton
-        </a>
-      </div>
-      <div class="audio gone">
-        <audio class="sfx">
-          <source src="audio/scratch.mp3" type="audio/mpeg">
-          <source src="audio/scratch.ogg" type="audio/ogg">
-          Your browser does not support this audio format.
-        </audio>
-      </div>
-    </article>
+    <ul class="board"><!--hackhackhack-->
+      <li id="row-0-col-0" class=""></li><li id="row-0-col-1" class=""></li><li id="row-0-col-2" class=""></li><li id="row-0-col-3" class=""></li><li id="row-0-col-4" class=""></li><li id="row-0-col-5" class=""></li><li id="row-0-col-6" class=""></li><li id="row-0-col-7" class=""></li><li id="row-0-col-8" class=""></li><li id="row-0-col-9" class=""></li><li id="row-0-col-10" class=""></li><li id="row-0-col-11" class=""></li><li id="row-0-col-12" class=""></li><li id="row-0-col-13" class=""></li><li id="row-0-col-14" class=""></li><li id="row-0-col-15" class=""></li><li id="row-1-col-0" class=""></li><li id="row-1-col-1" class=""></li><li id="row-1-col-2" class=""></li><li id="row-1-col-3" class=""></li><li id="row-1-col-4" class=""></li><li id="row-1-col-5" class=""></li><li id="row-1-col-6" class=""></li><li id="row-1-col-7" class=""></li><li id="row-1-col-8" class=""></li><li id="row-1-col-9" class=""></li><li id="row-1-col-10" class=""></li><li id="row-1-col-11" class=""></li><li id="row-1-col-12" class=""></li><li id="row-1-col-13" class=""></li><li id="row-1-col-14" class=""></li><li id="row-1-col-15" class=""></li><li id="row-2-col-0" class=""></li><li id="row-2-col-1" class=""></li><li id="row-2-col-2" class=""></li><li id="row-2-col-3" class=""></li><li id="row-2-col-4" class=""></li><li id="row-2-col-5" class=""></li><li id="row-2-col-6" class=""></li><li id="row-2-col-7" class=""></li><li id="row-2-col-8" class=""></li><li id="row-2-col-9" class=""></li><li id="row-2-col-10" class=""></li><li id="row-2-col-11" class=""></li><li id="row-2-col-12" class=""></li><li id="row-2-col-13" class=""></li><li id="row-2-col-14" class=""></li><li id="row-2-col-15" class=""></li><li id="row-3-col-0" class=""></li><li id="row-3-col-1" class=""></li><li id="row-3-col-2" class=""></li><li id="row-3-col-3" class=""></li><li id="row-3-col-4" class=""></li><li id="row-3-col-5" class=""></li><li id="row-3-col-6" class=""></li><li id="row-3-col-7" class=""></li><li id="row-3-col-8" class=""></li><li id="row-3-col-9" class=""></li><li id="row-3-col-10" class=""></li><li id="row-3-col-11" class=""></li><li id="row-3-col-12" class=""></li><li id="row-3-col-13" class=""></li><li id="row-3-col-14" class=""></li><li id="row-3-col-15" class=""></li><li id="row-4-col-0" class=""></li><li id="row-4-col-1" class=""></li><li id="row-4-col-2" class=""></li><li id="row-4-col-3" class=""></li><li id="row-4-col-4" class=""></li><li id="row-4-col-5" class=""></li><li id="row-4-col-6" class=""></li><li id="row-4-col-7" class=""></li><li id="row-4-col-8" class=""></li><li id="row-4-col-9" class=""></li><li id="row-4-col-10" class=""></li><li id="row-4-col-11" class=""></li><li id="row-4-col-12" class=""></li><li id="row-4-col-13" class=""></li><li id="row-4-col-14" class=""></li><li id="row-4-col-15" class=""></li><li id="row-5-col-0" class=""></li><li id="row-5-col-1" class=""></li><li id="row-5-col-2" class=""></li><li id="row-5-col-3" class=""></li><li id="row-5-col-4" class=""></li><li id="row-5-col-5" class=""></li><li id="row-5-col-6" class=""></li><li id="row-5-col-7" class=""></li><li id="row-5-col-8" class=""></li><li id="row-5-col-9" class=""></li><li id="row-5-col-10" class=""></li><li id="row-5-col-11" class=""></li><li id="row-5-col-12" class=""></li><li id="row-5-col-13" class=""></li><li id="row-5-col-14" class=""></li><li id="row-5-col-15" class=""></li><li id="row-6-col-0" class=""></li><li id="row-6-col-1" class=""></li><li id="row-6-col-2" class=""></li><li id="row-6-col-3" class=""></li><li id="row-6-col-4" class=""></li><li id="row-6-col-5" class=""></li><li id="row-6-col-6" class=""></li><li id="row-6-col-7" class=""></li><li id="row-6-col-8" class=""></li><li id="row-6-col-9" class=""></li><li id="row-6-col-10" class=""></li><li id="row-6-col-11" class=""></li><li id="row-6-col-12" class=""></li><li id="row-6-col-13" class=""></li><li id="row-6-col-14" class=""></li><li id="row-6-col-15" class=""></li><li id="row-7-col-0" class=""></li><li id="row-7-col-1" class=""></li><li id="row-7-col-2" class=""></li><li id="row-7-col-3" class=""></li><li id="row-7-col-4" class=""></li><li id="row-7-col-5" class=""></li><li id="row-7-col-6" class=""></li><li id="row-7-col-7" class=""></li><li id="row-7-col-8" class=""></li><li id="row-7-col-9" class=""></li><li id="row-7-col-10" class=""></li><li id="row-7-col-11" class=""></li><li id="row-7-col-12" class=""></li><li id="row-7-col-13" class=""></li><li id="row-7-col-14" class=""></li><li id="row-7-col-15" class=""></li><li id="row-8-col-0" class=""></li><li id="row-8-col-1" class=""></li><li id="row-8-col-2" class=""></li><li id="row-8-col-3" class=""></li><li id="row-8-col-4" class=""></li><li id="row-8-col-5" class=""></li><li id="row-8-col-6" class=""></li><li id="row-8-col-7" class=""></li><li id="row-8-col-8" class=""></li><li id="row-8-col-9" class=""></li><li id="row-8-col-10" class=""></li><li id="row-8-col-11" class=""></li><li id="row-8-col-12" class=""></li><li id="row-8-col-13" class=""></li><li id="row-8-col-14" class=""></li><li id="row-8-col-15" class=""></li><li id="row-9-col-0" class=""></li><li id="row-9-col-1" class=""></li><li id="row-9-col-2" class=""></li><li id="row-9-col-3" class=""></li><li id="row-9-col-4" class=""></li><li id="row-9-col-5" class=""></li><li id="row-9-col-6" class=""></li><li id="row-9-col-7" class=""></li><li id="row-9-col-8" class=""></li><li id="row-9-col-9" class=""></li><li id="row-9-col-10" class=""></li><li id="row-9-col-11" class=""></li><li id="row-9-col-12" class=""></li><li id="row-9-col-13" class=""></li><li id="row-9-col-14" class=""></li><li id="row-9-col-15" class=""></li><li id="row-10-col-0" class=""></li><li id="row-10-col-1" class=""></li><li id="row-10-col-2" class=""></li><li id="row-10-col-3" class=""></li><li id="row-10-col-4" class=""></li><li id="row-10-col-5" class=""></li><li id="row-10-col-6" class=""></li><li id="row-10-col-7" class=""></li><li id="row-10-col-8" class=""></li><li id="row-10-col-9" class=""></li><li id="row-10-col-10" class=""></li><li id="row-10-col-11" class=""></li><li id="row-10-col-12" class=""></li><li id="row-10-col-13" class=""></li><li id="row-10-col-14" class=""></li><li id="row-10-col-15" class=""></li><li id="row-11-col-0" class=""></li><li id="row-11-col-1" class=""></li><li id="row-11-col-2" class=""></li><li id="row-11-col-3" class=""></li><li id="row-11-col-4" class=""></li><li id="row-11-col-5" class=""></li><li id="row-11-col-6" class=""></li><li id="row-11-col-7" class=""></li><li id="row-11-col-8" class=""></li><li id="row-11-col-9" class=""></li><li id="row-11-col-10" class=""></li><li id="row-11-col-11" class=""></li><li id="row-11-col-12" class=""></li><li id="row-11-col-13" class=""></li><li id="row-11-col-14" class=""></li><li id="row-11-col-15" class=""></li><li id="row-12-col-0" class=""></li><li id="row-12-col-1" class=""></li><li id="row-12-col-2" class=""></li><li id="row-12-col-3" class=""></li><li id="row-12-col-4" class=""></li><li id="row-12-col-5" class=""></li><li id="row-12-col-6" class=""></li><li id="row-12-col-7" class=""></li><li id="row-12-col-8" class=""></li><li id="row-12-col-9" class=""></li><li id="row-12-col-10" class=""></li><li id="row-12-col-11" class=""></li><li id="row-12-col-12" class=""></li><li id="row-12-col-13" class=""></li><li id="row-12-col-14" class=""></li><li id="row-12-col-15" class=""></li><li id="row-13-col-0" class=""></li><li id="row-13-col-1" class=""></li><li id="row-13-col-2" class=""></li><li id="row-13-col-3" class=""></li><li id="row-13-col-4" class=""></li><li id="row-13-col-5" class=""></li><li id="row-13-col-6" class=""></li><li id="row-13-col-7" class=""></li><li id="row-13-col-8" class=""></li><li id="row-13-col-9" class=""></li><li id="row-13-col-10" class=""></li><li id="row-13-col-11" class=""></li><li id="row-13-col-12" class=""></li><li id="row-13-col-13" class=""></li><li id="row-13-col-14" class=""></li><li id="row-13-col-15" class=""></li><li id="row-14-col-0" class=""></li><li id="row-14-col-1" class=""></li><li id="row-14-col-2" class=""></li><li id="row-14-col-3" class=""></li><li id="row-14-col-4" class=""></li><li id="row-14-col-5" class=""></li><li id="row-14-col-6" class=""></li><li id="row-14-col-7" class=""></li><li id="row-14-col-8" class=""></li><li id="row-14-col-9" class=""></li><li id="row-14-col-10" class=""></li><li id="row-14-col-11" class=""></li><li id="row-14-col-12" class=""></li><li id="row-14-col-13" class=""></li><li id="row-14-col-14" class=""></li><li id="row-14-col-15" class=""></li><li id="row-15-col-0" class=""></li><li id="row-15-col-1" class=""></li><li id="row-15-col-2" class=""></li><li id="row-15-col-3" class=""></li><li id="row-15-col-4" class=""></li><li id="row-15-col-5" class=""></li><li id="row-15-col-6" class=""></li><li id="row-15-col-7" class=""></li><li id="row-15-col-8" class=""></li><li id="row-15-col-9" class=""></li><li id="row-15-col-10" class></li><li id="row-15-col-11" class=""></li><li id="row-15-col-12" class=""></li><li id="row-15-col-13" class=""></li><li id="row-15-col-14" class=""></li><li id="row-15-col-15" class=""></li>
+    </ul>
   </section>
   <script>
   $(function(){
-    var song = $(".song")[0];
-    song.volume = 0.5;
-
-    var blink = function(){
-      $(".modal").addClass("gone");
-      $(".shade").off();
-    };
-
-    var escapeHtml = function(str) {
-      var div = document.createElement('div');
-      div.appendChild(document.createTextNode(str));
-      return div.innerHTML;
-    };
-
     $("html").on("keypress", function(event){
       if (event.keyCode == 13){
-        $("form.controls").submit();
+        $("#new-game").submit();
       }
     })
 
-    $("button.show-scores").on("click", function(){
-      $(".modal").removeClass("gone");
-      $(".shade").on("click", function(){
-        blink();
-      })
-    })
-
-    $("form.user-name").on("keypress", function(event){
-      if (event.keyCode == 13) {
-        event.preventDefault();
-        $("form.user-name").submit();
-      }
-    });
-
-    $("form.user-name").on("submit", function(event){
+    $("#new-game").on("submit", function(event){
       event.preventDefault();
-      $("form.user-name").addClass("gone");
-      $(".shade").addClass("gone");
-      unsafeStr = $("input[type=text]").val();
-      snakeUserName = escapeHtml(unsafeStr);
-      if (snakeUserName === ""){
-        snakeUserName = "Anonymous";
-      }
-      game.postHighScore();
-      game = null;
-    })
-
-    $("form.controls").on("submit", function(event){
-      event.preventDefault();
-      blink();
-      var quality = $('input[name=quality]:checked').val();
-      var size = $('input[name=size]:checked').val();
-      var timeStep = $('input[name=timeStep]:checked').val();
-      var music = $('input[name=music]:checked').val() == "true" ? true : false;
-      
-      Program.start(size, timeStep, quality, music);
+      Program.start();
     }) 
   })
   </script>
