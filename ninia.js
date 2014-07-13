@@ -291,6 +291,7 @@
         this.life.update();
         this.snake.update();
         this.render();
+        $("li").off("mouseenter");
         this.turnCount += 1;
         this.boringTurnStreak += 1;
         if (this.turnCount % 5 === 0) {
@@ -325,7 +326,7 @@
         this.appleCount += 1;
         this.tankSize += 1;
         this.apple = coord;
-        this.boringTurnStreak = 0;
+        this.boringTurnStreak = this.appleCount;
         return $find(this.apple).addClass("apple");
       };
 

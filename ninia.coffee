@@ -190,6 +190,8 @@ window.Program = do ->
       do @snake.update
       do @render
 
+      $("li").off("mouseenter")
+
       @turnCount += 1
       @boringTurnStreak += 1
       if @turnCount % 5 == 0
@@ -221,7 +223,7 @@ window.Program = do ->
       @appleCount += 1
       @tankSize += 1
       @apple = coord
-      @boringTurnStreak = 0
+      @boringTurnStreak = @appleCount
       $find(@apple).addClass("apple")
 
     getAddedScore: -> 
