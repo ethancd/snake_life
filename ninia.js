@@ -35,9 +35,12 @@
     bindMouse = function(game) {
       return $("html").on("mousedown", function(event) {
         if (event.target.tagName === "LI") {
-          game.toggleLiving(event);
-          return game.timelessUpdate();
+          game.wash(event);
         }
+        $("li").on("mouseenter", game.wash.bind(game));
+        return $("html").on("mouseup", function() {
+          return $("li").off("mouseenter");
+        });
       });
     };
     bindKeys = function(game) {
@@ -257,10 +260,12 @@
     Game = (function() {
       function Game(size) {
         this.size = size;
-        this.score = this.appleCount = 0;
+        this.turnCount = this.score = this.appleCount = 0;
         this.framesPerMinute = 1;
         this.timeless = true;
         this.$cells = $('li');
+        this.tankSize = 4;
+        this.waterLevel = 5;
         this.snake = new Snake(this, 5);
         this.life = new Life(this);
         this.addApple();
@@ -287,12 +292,25 @@
         this.snake.update();
         this.render();
         this.turnCount += 1;
-        return this.boringTurnStreak += 1;
+        this.boringTurnStreak += 1;
+        if (this.turnCount % 5 === 0) {
+          return this.waterLevel = _.min([this.waterLevel + 1, this.tankSize]);
+        }
       };
 
       Game.prototype.render = function() {
         $(".score").html(" " + this.score);
+        this.renderWaterTank();
         return this.updateClass();
+      };
+
+      Game.prototype.renderWaterTank = function() {
+        var percentageHeight, topValue;
+        percentageHeight = 1 - (this.waterLevel / this.tankSize);
+        topValue = $('#water-tank').height() * percentageHeight;
+        return $("#water-level").css({
+          'top': topValue + "px"
+        });
       };
 
       Game.prototype.addApple = function() {
@@ -305,6 +323,7 @@
         }
         this.score += this.getAddedScore();
         this.appleCount += 1;
+        this.tankSize += 1;
         this.apple = coord;
         this.boringTurnStreak = 0;
         return $find(this.apple).addClass("apple");
@@ -355,13 +374,17 @@
         return window.game = null;
       };
 
-      Game.prototype.toggleLiving = function(event) {
+      Game.prototype.wash = function(event) {
         var cell, node;
+        if (!this.waterLevel) {
+          return;
+        }
         node = event.target;
         cell = this.getId(node);
         if (this.life.has(cell)) {
           this.kill(node, cell);
-          return this.timelessUpdate;
+          this.waterLevel -= 1;
+          return this.renderWaterTank();
         }
       };
 

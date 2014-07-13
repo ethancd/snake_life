@@ -23,9 +23,9 @@ window.Program = do ->
 
   bindMouse = (game) ->
     $("html").on "mousedown", (event) ->
-      if event.target.tagName is "LI"
-        game.toggleLiving(event)
-        do game.timelessUpdate
+      game.wash(event) if event.target.tagName is "LI"
+      $("li").on "mouseenter", game.wash.bind(game)
+      $("html").on "mouseup", -> $("li").off("mouseenter")
 
   bindKeys = (game) ->
     $('html').on keydown:
@@ -161,10 +161,12 @@ window.Program = do ->
 
   class Game
     constructor: (@size) ->
-      @score = @appleCount = 0
+      @turnCount = @score = @appleCount = 0
       @framesPerMinute = 1
       @timeless = true
       @$cells = $('li')
+      @tankSize = 4
+      @waterLevel = 5
 
       @snake = new Snake(@, 5)
       @life = new Life(@)
@@ -190,10 +192,18 @@ window.Program = do ->
 
       @turnCount += 1
       @boringTurnStreak += 1
+      if @turnCount % 5 == 0
+        @waterLevel = _.min([@waterLevel + 1, @tankSize])
 
     render: ->
       $(".score").html(" " + @score)
+      do @renderWaterTank
       do @updateClass
+
+    renderWaterTank: -> 
+      percentageHeight = 1 - (@waterLevel / @tankSize)
+      topValue = $('#water-tank').height() * percentageHeight
+      $("#water-level").css('top': topValue + "px")
 
     addApple: ->
       loop
@@ -209,6 +219,7 @@ window.Program = do ->
 
       @score += do @getAddedScore
       @appleCount += 1
+      @tankSize += 1
       @apple = coord
       @boringTurnStreak = 0
       $find(@apple).addClass("apple")
@@ -243,13 +254,15 @@ window.Program = do ->
 
       window.game = null
      
-    toggleLiving: (event) ->
+    wash: (event) ->
+      return unless @waterLevel
       node = event.target
       cell = @getId(node)
 
       if @life.has(cell)
-        @kill(node, cell) 
-        @timelessUpdate
+        @kill(node, cell)
+        @waterLevel -= 1
+        do @renderWaterTank
         
     kill: (node, cell) ->
       if @life.has(cell)

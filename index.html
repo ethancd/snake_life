@@ -1,7 +1,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Snake/Life</title>
+  <title>Snake on Fire</title>
 
   <link href='/snake_life/favicon.ico' rel="shortcut icon" type="image/vnd.microsoft.icon">
   <link rel="stylesheet" type="text/css" href="style.css">
@@ -15,17 +15,20 @@
   <div class="modal shade gone"></div>
 
     <header class="wrap">
-      <h1><strong class="snake">Snake</strong> / <strong class="life">Life</strong></h1>
+      <h1><strong class="snake">Snake</strong> on <strong class="life">Fire</strong></h1>
       <h2 class="running-score hidden">
         Score: <strong class="score">0</strong><em class="potential"></em>
       </h2>
+
+      <form action="" id="new-game">
+        <input type="submit" value="New Game">
+      </form>
     </header>
 
   <section class="wrap">
-    <form action="" id="new-game">
-      <input type="submit" value="New Game">
-    </form>
-
+    <div id="water-tank">
+      <div id="water-level"></div>
+    </div>
     <ul id="board">
     </ul>
   </section>
