@@ -1,0 +1,130 @@
+/* would you believe how oh-my-god-infuriating 
+chrome can be with .less files? me neither */
+
+html,
+body,
+article,
+button,
+input,
+form,
+h1,
+h2,
+h3,
+ul,
+ol,
+li,
+p {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font-family: sans-serif;
+}
+.hidden {
+  opacity: 0 !important;
+}
+.gone {
+  display: none !important;
+}
+body {
+  background-color: #fafafa;
+  color: #666666;
+}
+.wrap {
+  position: relative;
+  width: 1000px;
+  margin: auto;
+}
+.no-box-shadow {
+  box-shadow: 0px 0px 0px #000 !important;
+}
+header h1 {
+  width: 660px;
+  margin: 20px 0px 0px 90px;
+  text-align: center;
+  font-size: 200%;
+}
+header h1 .snake {
+  color: #00b800;
+}
+header h1 .life {
+  color: #ff0000;
+  text-shadow: 0px 0px 20px #ff0000;
+}
+header h2 {
+  font-size: 200%;
+}
+header h2 strong {
+  font-size: 150%;
+  color: #0000ff;
+  text-shadow: 0px 0px 20px #0000ff;
+}
+header h2 em {
+  color: #00b800;
+  font-size: 60%;
+}
+header h3 {
+  font-size: 150%;
+  color: #666666;
+}
+header h3 strong {
+  font-size: 120%;
+  color: #ff0000;
+  text-shadow: 0px 0px 20px #ff0000;
+}
+header button {
+  color: #666666;
+  margin: 10px 0px;
+  background-color: #0000ff;
+  box-shadow: 0px 0px 20px #0000ff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+header button:hover,
+header button:focus {
+  outline: none;
+  background-color: #00b800;
+  box-shadow: 0px 0px 20px #00b800;
+}
+ul {
+  margin: -50px auto 0 auto;
+  left: 100px;
+  list-style: none;
+  background-color: #ffffff;
+  border: 1px solid #00b800;
+  width: 480px;
+  height: 480px;
+}
+ul li {
+  float: left;
+  display: block;
+  width: 30px;
+  height: 30px;
+  border-radius: 5px;
+}
+ul li:hover {
+  border: 1px solid #ff0000;
+  width: 28px;
+  height: 28px;
+}
+ul li.apple {
+  background: url("file:///C:/Users/Ethan/Desktop/snake_life/images/apple.png");
+  background-position: 2px 0px;
+  background-size: auto 30px;
+  background-repeat: no-repeat;
+}
+ul li.apple:hover {
+  background-position: 1px -1px;
+}
+ul li.snake {
+  background-color: #00b800;
+}
+ul li.living {
+  background-color: #ff0000;
+}
+ul li.living:hover {
+  border: 1px solid #00ffff;
+}
+ul li.water {
+  background-color: #0000ff;
+}

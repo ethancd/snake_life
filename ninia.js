@@ -36,11 +36,8 @@
       return $("html").on("mousedown", function(event) {
         if (event.target.tagName === "LI") {
           game.toggleLiving(event);
+          return game.timelessUpdate();
         }
-        $("li").on("mouseenter", game.toggleLiving.bind(game));
-        return $("html").on("mouseup", function() {
-          return $("li").off("mouseenter");
-        });
       });
     };
     bindKeys = function(game) {
@@ -138,12 +135,11 @@
       Snake.prototype.update = function() {
         var next;
         next = this.getNext();
-        if ((this.game.apple != null) && next.join() === this.game.apple.join()) {
-          $find(next).removeClass("apple");
-          this.game.addApple();
-        }
         if (this.has(next) || this.game.life.has(next)) {
           this.game.gameOver();
+        } else if ((this.game.apple != null) && next.join() === this.game.apple.join()) {
+          $find(next).removeClass("apple");
+          this.game.addApple();
         } else {
           this.game.life.list[this.body.pop().join()] = true;
         }
@@ -156,34 +152,27 @@
     })();
     Life = (function() {
       function Life(game) {
-        var cell, cells, self, shift, _i, _len;
         this.game = game;
-        self = this;
         this.list = {};
-        this.activeCells = 5;
-        this.rPentomino = [[-2, 0], [-2, 1], [-1, 0], [0, 0], [-1, -1]];
-        cells = (function() {
-          var _i, _len, _ref, _results;
-          _ref = this.rPentomino;
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            shift = _ref[_i];
-            _results.push((function(shift) {
-              return [shift[0] + 8, shift[1] + 8];
-            })(shift));
-          }
-          return _results;
-        }).call(this);
-        for (_i = 0, _len = cells.length; _i < _len; _i++) {
-          cell = cells[_i];
-          this.list[cell.join()] = true;
-        }
-        this.list;
       }
+
+      Life.prototype.patterns = {
+        glider: [[0, 1], [1, 2], [2, 0], [2, 1], [2, 2]],
+        rPentonimo: [[0, 1], [0, 2], [1, 0], [1, 1], [2, 1]],
+        shortTable: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2]]
+      };
+
+      Life.prototype.pickPattern = function() {
+        var randomIndex;
+        randomIndex = Math.floor(Math.random() * _.size(this.patterns));
+        return _.values(this.patterns)[randomIndex];
+      };
 
       Life.prototype.update = function() {
         this.list = this.detectionSweep();
-        return this.activeCells = _.size(this.list);
+        if (this.notActiveEnough()) {
+          return this.addDeNovoPattern();
+        }
       };
 
       Life.prototype.detectionSweep = function() {
@@ -198,6 +187,37 @@
           }
         }
         return tempList;
+      };
+
+      Life.prototype.notActiveEnough = function() {
+        return _.size(this.list) < 5 + (this.game.boringTurnStreak / 5);
+      };
+
+      Life.prototype.addDeNovoPattern = function() {
+        var cell, cells, coord, shift, _i, _len;
+        while (true) {
+          coord = [Math.floor(Math.random() * this.game.size), Math.floor(Math.random() * this.game.size)];
+          if (!this.game.near(coord, this.game.snake.body[0], 6)) {
+            break;
+          }
+        }
+        cells = (function() {
+          var _i, _len, _ref, _results;
+          _ref = this.pickPattern();
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            shift = _ref[_i];
+            _results.push((function(shift) {
+              return [shift[0] + coord[0], shift[1] + coord[1]];
+            })(shift));
+          }
+          return _results;
+        }).call(this);
+        for (_i = 0, _len = cells.length; _i < _len; _i++) {
+          cell = cells[_i];
+          this.list[cell.join()] = true;
+        }
+        return this.game.boringTurnStreak = 0;
       };
 
       Life.prototype.countLiving = function(cell) {
@@ -237,12 +257,14 @@
     Game = (function() {
       function Game(size) {
         this.size = size;
-        this.score = this.appleCount = this.framesPerMinute = 1;
+        this.score = this.appleCount = 0;
+        this.framesPerMinute = 1;
         this.timeless = true;
         this.$cells = $('li');
         this.snake = new Snake(this, 5);
         this.life = new Life(this);
         this.addApple();
+        this.render();
       }
 
       Game.prototype.toggleTime = function() {
@@ -262,9 +284,10 @@
 
       Game.prototype.update = function() {
         this.life.update();
-        this.render();
         this.snake.update();
-        return this.turnCount += 1;
+        this.render();
+        this.turnCount += 1;
+        return this.boringTurnStreak += 1;
       };
 
       Game.prototype.render = function() {
@@ -280,14 +303,17 @@
             break;
           }
         }
-        this.appleCount += 1;
         this.score += this.getAddedScore();
+        this.appleCount += 1;
         this.apple = coord;
+        this.boringTurnStreak = 0;
         return $find(this.apple).addClass("apple");
       };
 
       Game.prototype.getAddedScore = function() {
-        return _.max([0, Math.floor(this.appleCount * _.max(1, Math.pow(this.getTimeModifier(), 2)))]);
+        var timeMod;
+        timeMod = Math.pow(this.getTimeModifier(), 2) + 1;
+        return Math.pow(Math.floor(this.appleCount * timeMod), 2);
       };
 
       Game.prototype.getTimeModifier = function() {
@@ -301,6 +327,8 @@
       Game.prototype.updateClass = function() {
         var cell, cellArr, coord, _i, _len, _ref, _results;
         this.$cells.removeClass("water");
+        this.$cells.removeClass("snake");
+        this.$cells.removeClass("living");
         _ref = this.$cells;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -320,9 +348,10 @@
       };
 
       Game.prototype.gameOver = function() {
-        $(".running-score").addClass("gone");
         $("html").off("mousedown").off("keydown");
-        clearInterval(handler);
+        if (window.handler != null) {
+          clearInterval(handler);
+        }
         return window.game = null;
       };
 
@@ -356,6 +385,10 @@
 
       Game.prototype.getId = function(target) {
         return [parseInt($(target).attr("id").split("-")[1]), parseInt($(target).attr("id").split("-")[3])];
+      };
+
+      Game.prototype.near = function(cellA, cellB, distance) {
+        return Math.abs(cellA[0] - cellB[0]) % (this.size / 2) < distance || Math.abs(cellA[1] - cellB[1]) % (this.size / 2) < distance;
       };
 
       return Game;

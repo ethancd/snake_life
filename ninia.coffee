@@ -23,9 +23,9 @@ window.Program = do ->
 
   bindMouse = (game) ->
     $("html").on "mousedown", (event) ->
-      game.toggleLiving(event) if event.target.tagName is "LI"
-      $("li").on "mouseenter", game.toggleLiving.bind(game)
-      $("html").on "mouseup", -> $("li").off("mouseenter")
+      if event.target.tagName is "LI"
+        game.toggleLiving(event)
+        do game.timelessUpdate
 
   bindKeys = (game) ->
     $('html').on keydown:
@@ -84,12 +84,11 @@ window.Program = do ->
     update: ->
       next = do @getNext
 
-      if @game.apple? and next.join() is @game.apple.join()
-        $find(next).removeClass("apple")
-        do @game.addApple 
-
       if @has(next) or @game.life.has(next)
         do @game.gameOver 
+      else if @game.apple? and next.join() is @game.apple.join()
+        $find(next).removeClass("apple")
+        do @game.addApple 
       else
         @game.life.list[@body.pop().join()] = true
 
@@ -98,24 +97,21 @@ window.Program = do ->
 
   class Life
     constructor: (@game) ->
-      self = @
       @list = {}
-      @activeCells = 5
 
-      @rPentomino = [[-2, 0], [-2, 1], [-1, 0], [0, 0], [-1, -1]]
+    patterns: {
+      glider: [[0, 1], [1, 2], [2, 0], [2, 1], [2, 2]],
+      rPentonimo: [[0, 1], [0, 2], [1, 0], [1, 1], [2, 1]],
+      shortTable: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2]]
+    }
 
-      cells = for shift in @rPentomino 
-        do (shift) ->
-          [shift[0] + 8,
-           shift[1] + 8]
+    pickPattern: ->
+      randomIndex = Math.floor(Math.random() * _.size(@patterns))
+      _.values(@patterns)[randomIndex]
 
-      @list[cell.join()] = true for cell in cells
-
-      @list
-   
     update: ->
       @list = do @detectionSweep
-      @activeCells = _.size(@list) 
+      do @addDeNovoPattern if do @notActiveEnough  
 
     detectionSweep: ->
       tempList = {}
@@ -126,6 +122,27 @@ window.Program = do ->
             tempList[[i,j].join()] = true
 
       tempList
+
+    notActiveEnough: ->
+      _.size(@list) < 5 + (@game.boringTurnStreak / 5)
+
+    addDeNovoPattern: ->
+      loop
+        coord = [
+          Math.floor(Math.random() * @game.size), 
+          Math.floor(Math.random() * @game.size)
+        ]
+
+        unless @game.near(coord, @game.snake.body[0], 6)
+          break
+
+      cells = for shift in do @pickPattern
+        do (shift) ->
+          [shift[0] + coord[0],
+           shift[1] + coord[1]]
+
+      @list[cell.join()] = true for cell in cells
+      @game.boringTurnStreak = 0
 
     countLiving: (cell) -> 
       (nabe for nabe in @neighbors(cell) when @has(nabe)).length
@@ -144,7 +161,8 @@ window.Program = do ->
 
   class Game
     constructor: (@size) ->
-      @score = @appleCount = @framesPerMinute = 1
+      @score = @appleCount = 0
+      @framesPerMinute = 1
       @timeless = true
       @$cells = $('li')
 
@@ -152,6 +170,7 @@ window.Program = do ->
       @life = new Life(@)
 
       do @addApple
+      do @render
 
     toggleTime: ->
       @timeless = not @timeless
@@ -166,10 +185,11 @@ window.Program = do ->
 
     update: ->
       do @life.update
-      do @render
       do @snake.update
+      do @render
 
       @turnCount += 1
+      @boringTurnStreak += 1
 
     render: ->
       $(".score").html(" " + @score)
@@ -187,20 +207,23 @@ window.Program = do ->
                 @life.has(coord)
           break
 
-      @appleCount += 1
       @score += do @getAddedScore
+      @appleCount += 1
       @apple = coord
+      @boringTurnStreak = 0
       $find(@apple).addClass("apple")
 
     getAddedScore: -> 
-      _.max([0, Math.floor((@appleCount) * _.max(1, Math.pow(@getTimeModifier(), 2)))])
-
+      timeMod = Math.pow(@getTimeModifier(), 2) + 1
+      Math.pow(Math.floor(@appleCount * timeMod), 2)
 
     getTimeModifier: ->
       if @timeless then 0 else @framesPerMinute
 
     updateClass: ->
       @$cells.removeClass("water")
+      @$cells.removeClass("snake")
+      @$cells.removeClass("living")
 
       for cell in @$cells
         cellArr = cell.id.split("-")
@@ -213,10 +236,11 @@ window.Program = do ->
           $(cell).addClass("living")
 
     gameOver: ->
-      $(".running-score").addClass("gone")
       $("html").off("mousedown").off("keydown")
 
-      clearInterval(handler)
+      if window.handler?
+        clearInterval(handler)
+
       window.game = null
      
     toggleLiving: (event) ->
@@ -241,5 +265,9 @@ window.Program = do ->
     getId: (target) ->
       [parseInt($(target).attr("id").split("-")[1]),
        parseInt($(target).attr("id").split("-")[3])]
+
+    near: (cellA, cellB, distance) ->
+      Math.abs(cellA[0] - cellB[0]) % (@size / 2) < distance ||
+      Math.abs(cellA[1] - cellB[1]) % (@size / 2) < distance
 
   {start: start}
