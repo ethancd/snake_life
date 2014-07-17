@@ -4,6 +4,7 @@ chrome can be with .less files? me neither */
 html,
 body,
 article,
+section,
 button,
 input,
 form,
@@ -21,81 +22,100 @@ p {
   font-family: sans-serif;
 }
 .hidden {
-  opacity: 0 !important;
+  visibility: hidden !important;
 }
 .gone {
   display: none !important;
 }
 body {
-  background-color: #fafafa;
+  background-color: #eeeeee;
   color: #666666;
 }
-.wrap {
-  position: relative;
-  width: 1000px;
+header {
+  width: 482px;
   margin: auto;
 }
-.no-box-shadow {
-  box-shadow: 0px 0px 0px #000 !important;
+header:after {
+  content: "";
+  display: table;
+  clear: both;
 }
-header h1 {
-  width: 660px;
-  margin: 20px 0px 0px 90px;
+section {
+  width: 482px;
+  margin: auto;
+  position: relative;
+}
+h1 {
+  display: inline-block;
+  width: 100%;
   text-align: center;
-  font-size: 200%;
+  font-size: 60px;
 }
-header h1 .snake {
-  color: #00b800;
+h2 {
+  font-size: 24px;
 }
-header h1 .life {
-  color: #ff0000;
-  text-shadow: 0px 0px 20px #ff0000;
+.counts {
+  position: absolute;
+  top: 60px;
+  left: 570px;
+  min-width: 130px;
 }
-header h2 {
-  font-size: 200%;
+.count {
+  color: #333;
+  margin-bottom: 10px;
 }
-header h2 strong {
-  font-size: 150%;
-  color: #0000ff;
-  text-shadow: 0px 0px 20px #0000ff;
+.total-score {
+  color: #333;
+  margin-bottom: 10px;
 }
-header h2 em {
-  color: #00b800;
-  font-size: 60%;
+.total-score .score {
+  color: #111;
 }
-header h3 {
-  font-size: 150%;
-  color: #666666;
+.apple-count {
+  color: #333;
+  margin-bottom: 10px;
 }
-header h3 strong {
-  font-size: 120%;
-  color: #ff0000;
-  text-shadow: 0px 0px 20px #ff0000;
+.apple-count .score {
+  color: #ccac00;
 }
-header button {
-  color: #666666;
-  margin: 10px 0px;
-  background-color: #0000ff;
-  box-shadow: 0px 0px 20px #0000ff;
-  border-radius: 5px;
-  cursor: pointer;
+.flame-count {
+  color: #333;
+  margin-bottom: 10px;
 }
-header button:hover,
-header button:focus {
-  outline: none;
-  background-color: #00b800;
-  box-shadow: 0px 0px 20px #00b800;
+.flame-count .score {
+  color: #0000cc;
+}
+.turn-count {
+  color: #333;
+  margin-bottom: 10px;
+}
+.turn-count .score {
+  color: #008500;
+}
+.score {
+  display: inline-block;
+  float: left;
+  margin-right: 8px;
+}
+#pause-modal {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  text-align: center;
+  background-color: rgba(192, 192, 192, 0.8);
+  display: none;
 }
 #water-tank {
-  position: relative;
-  left: 200px;
+  position: absolute;
+  left: 20px;
   top: 60px;
   height: 360px;
   width: 30px;
   overflow: hidden;
-  float: left;
   border-radius: 20px;
-  border: 3px solid #999999;
+  border: 3px solid #999;
 }
 #water-level {
   background-color: #0000ff;
@@ -103,45 +123,447 @@ header button:focus {
   width: 100%;
   position: relative;
 }
-ul {
-  margin: -50px auto 0 auto;
-  left: 100px;
+#board {
+  margin: auto;
   list-style: none;
-  background-color: #ffffff;
+  background-color: #000000;
   border: 1px solid #00b800;
   width: 480px;
   height: 480px;
 }
-ul li {
+#board li {
   float: left;
   display: block;
   width: 30px;
   height: 30px;
   border-radius: 5px;
 }
-ul li:hover {
-  border: 1px solid #ff0000;
+#board li:hover {
+  border: 1px solid #00ffff;
   width: 28px;
   height: 28px;
 }
-ul li.apple {
-  background: url("file:///C:/Users/Ethan/Desktop/snake_life/images/apple.png");
-  background-position: 2px 0px;
-  background-size: auto 30px;
-  background-repeat: no-repeat;
+#board .apple {
+  background-color: #ffd700;
+  border-radius: 30px;
+  box-shadow: 0 0 8px #ffd700;
 }
-ul li.apple:hover {
-  background-position: 1px -1px;
-}
-ul li.snake {
+#board .snake {
   background-color: #00b800;
 }
-ul li.living {
+#board .head {
+  background-color: #008500;
+  border-radius: 5px;
+  box-shadow: 0 0 2px #00b800;
+}
+#board .living {
   background-color: #ff0000;
+  border-radius: 5px;
 }
-ul li.living:hover {
-  border: 1px solid #00ffff;
-}
-ul li.water {
+#board .water {
   background-color: #0000ff;
+  border-radius: 5px;
+}
+@media only screen and (min-width: 0) and (min-height: 0) {
+  section,
+  header {
+    width: 66px;
+  }
+  h1 {
+    font-size: 16px;
+  }
+  #water-tank {
+    height: 48px;
+    width: 4px;
+    top: 8px;
+    left: -8px;
+  }
+  .counts {
+    top: 8px;
+    left: 68px;
+  }
+  #board {
+    width: 64px;
+    height: 64px;
+  }
+  #board li {
+    width: 4px;
+    height: 4px;
+  }
+  #board li:hover {
+    width: 2px;
+    height: 2px;
+  }
+}
+@media only screen and (min-width: 200px) and (min-height: 178px) {
+  section,
+  header {
+    width: 130px;
+  }
+  h1 {
+    font-size: 16px;
+  }
+  #water-tank {
+    height: 96px;
+    width: 8px;
+    top: 16px;
+    left: -16px;
+  }
+  .counts {
+    top: 16px;
+    left: 136px;
+  }
+  #board {
+    width: 128px;
+    height: 128px;
+  }
+  #board li {
+    width: 8px;
+    height: 8px;
+  }
+  #board li:hover {
+    width: 6px;
+    height: 6px;
+  }
+}
+@media only screen and (min-width: 300px) and (min-height: 242px) {
+  section,
+  header {
+    width: 194px;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  #water-tank {
+    height: 144px;
+    width: 12px;
+    top: 24px;
+    left: -24px;
+  }
+  .counts {
+    top: 24px;
+    left: 204px;
+  }
+  #board {
+    width: 192px;
+    height: 192px;
+  }
+  #board li {
+    width: 12px;
+    height: 12px;
+  }
+  #board li:hover {
+    width: 10px;
+    height: 10px;
+  }
+}
+@media only screen and (min-width: 400px) and (min-height: 306px) {
+  section,
+  header {
+    width: 258px;
+  }
+  h1 {
+    font-size: 36px;
+  }
+  #water-tank {
+    height: 192px;
+    width: 16px;
+    top: 32px;
+    left: -32px;
+  }
+  .counts {
+    top: 32px;
+    left: 272px;
+  }
+  #board {
+    width: 256px;
+    height: 256px;
+  }
+  #board li {
+    width: 16px;
+    height: 16px;
+  }
+  #board li:hover {
+    width: 14px;
+    height: 14px;
+  }
+}
+@media only screen and (min-width: 500px) and (min-height: 395px) {
+  section,
+  header {
+    width: 322px;
+  }
+  h1 {
+    font-size: 48px;
+  }
+  #water-tank {
+    height: 240px;
+    width: 20px;
+    top: 40px;
+    left: -40px;
+  }
+  .counts {
+    top: 40px;
+    left: 340px;
+  }
+  #board {
+    width: 320px;
+    height: 320px;
+  }
+  #board li {
+    width: 20px;
+    height: 20px;
+  }
+  #board li:hover {
+    width: 18px;
+    height: 18px;
+  }
+}
+@media only screen and (min-width: 600px) and (min-height: 459px) {
+  section,
+  header {
+    width: 386px;
+  }
+  h1 {
+    font-size: 48px;
+  }
+  #water-tank {
+    height: 288px;
+    width: 24px;
+    top: 48px;
+    left: -48px;
+  }
+  .counts {
+    top: 48px;
+    left: 408px;
+  }
+  #board {
+    width: 384px;
+    height: 384px;
+  }
+  #board li {
+    width: 24px;
+    height: 24px;
+  }
+  #board li:hover {
+    width: 22px;
+    height: 22px;
+  }
+}
+@media only screen and (min-width: 700px) and (min-height: 548px) {
+  section,
+  header {
+    width: 450px;
+  }
+  h1 {
+    font-size: 60px;
+  }
+  #water-tank {
+    height: 336px;
+    width: 28px;
+    top: 56px;
+    left: -56px;
+  }
+  .counts {
+    top: 56px;
+    left: 476px;
+  }
+  #board {
+    width: 448px;
+    height: 448px;
+  }
+  #board li {
+    width: 28px;
+    height: 28px;
+  }
+  #board li:hover {
+    width: 26px;
+    height: 26px;
+  }
+}
+@media only screen and (min-width: 800px) and (min-height: 612px) {
+  section,
+  header {
+    width: 514px;
+  }
+  h1 {
+    font-size: 60px;
+  }
+  #water-tank {
+    height: 384px;
+    width: 32px;
+    top: 64px;
+    left: -64px;
+  }
+  .counts {
+    top: 64px;
+    left: 544px;
+  }
+  #board {
+    width: 512px;
+    height: 512px;
+  }
+  #board li {
+    width: 32px;
+    height: 32px;
+  }
+  #board li:hover {
+    width: 30px;
+    height: 30px;
+  }
+}
+@media only screen and (min-width: 900px) and (min-height: 676px) {
+  section,
+  header {
+    width: 578px;
+  }
+  h1 {
+    font-size: 60px;
+  }
+  #water-tank {
+    height: 432px;
+    width: 36px;
+    top: 72px;
+    left: -72px;
+  }
+  .counts {
+    top: 72px;
+    left: 612px;
+  }
+  #board {
+    width: 576px;
+    height: 576px;
+  }
+  #board li {
+    width: 36px;
+    height: 36px;
+  }
+  #board li:hover {
+    width: 34px;
+    height: 34px;
+  }
+}
+@media only screen and (min-width: 1000px) and (min-height: 740px) {
+  section,
+  header {
+    width: 642px;
+  }
+  h1 {
+    font-size: 60px;
+  }
+  #water-tank {
+    height: 480px;
+    width: 40px;
+    top: 80px;
+    left: -80px;
+  }
+  .counts {
+    top: 80px;
+    left: 680px;
+  }
+  #board {
+    width: 640px;
+    height: 640px;
+  }
+  #board li {
+    width: 40px;
+    height: 40px;
+  }
+  #board li:hover {
+    width: 38px;
+    height: 38px;
+  }
+}
+@media only screen and (min-width: 1100px) and (min-height: 804px) {
+  section,
+  header {
+    width: 706px;
+  }
+  h1 {
+    font-size: 60px;
+  }
+  #water-tank {
+    height: 528px;
+    width: 44px;
+    top: 88px;
+    left: -88px;
+  }
+  .counts {
+    top: 88px;
+    left: 748px;
+  }
+  #board {
+    width: 704px;
+    height: 704px;
+  }
+  #board li {
+    width: 44px;
+    height: 44px;
+  }
+  #board li:hover {
+    width: 42px;
+    height: 42px;
+  }
+}
+@media only screen and (min-width: 1200px) and (min-height: 868px) {
+  section,
+  header {
+    width: 770px;
+  }
+  h1 {
+    font-size: 60px;
+  }
+  #water-tank {
+    height: 576px;
+    width: 48px;
+    top: 96px;
+    left: -96px;
+  }
+  .counts {
+    top: 96px;
+    left: 816px;
+  }
+  #board {
+    width: 768px;
+    height: 768px;
+  }
+  #board li {
+    width: 48px;
+    height: 48px;
+  }
+  #board li:hover {
+    width: 46px;
+    height: 46px;
+  }
+}
+@media only screen and (min-width: 1300px) and (min-height: 932px) {
+  section,
+  header {
+    width: 834px;
+  }
+  h1 {
+    font-size: 60px;
+  }
+  #water-tank {
+    height: 624px;
+    width: 52px;
+    top: 104px;
+    left: -104px;
+  }
+  .counts {
+    top: 104px;
+    left: 884px;
+  }
+  #board {
+    width: 832px;
+    height: 832px;
+  }
+  #board li {
+    width: 52px;
+    height: 52px;
+  }
+  #board li:hover {
+    width: 50px;
+    height: 50px;
+  }
 }

@@ -4,7 +4,7 @@
     var $find, Game, Life, Snake, bindKeys, bindMouse, populateBoard, resetInfo, start;
     start = function() {
       if (typeof game !== "undefined" && game !== null) {
-        game.gameOver();
+        return;
       }
       resetInfo();
       populateBoard(16);
@@ -12,8 +12,8 @@
       bindMouse(game);
       return bindKeys(game);
     };
-    resetInfo = function(music) {
-      return $(".running-score").removeClass("hidden gone");
+    resetInfo = function() {
+      return $(".score").text("0");
     };
     populateBoard = function(size) {
       var $board, i, j, _i, _results;
@@ -34,6 +34,7 @@
     };
     bindMouse = function(game) {
       return $("html").on("mousedown", function(event) {
+        event.preventDefault();
         if (event.target.tagName === "LI") {
           game.wash(event);
         }
@@ -46,6 +47,10 @@
     bindKeys = function(game) {
       return $('html').on({
         keydown: function(event) {
+          var _ref;
+          if ((_ref = event.keyCode) === 32 || _ref === 37 || _ref === 38 || _ref === 39 || _ref === 40 || _ref === 65 || _ref === 68 || _ref === 80 || _ref === 83 || _ref === 87) {
+            event.preventDefault();
+          }
           switch (event.keyCode) {
             case 38:
             case 87:
@@ -60,7 +65,8 @@
             case 68:
               return game.snake.east();
             case 32:
-              return game.toggleTime();
+            case 80:
+              return game.togglePause();
           }
         }
       });
@@ -81,41 +87,43 @@
         startY = 12;
         startX = 6;
         i = -1;
-        return this.body = (function() {
+        this.body = (function() {
           var _results;
           _results = [];
-          while (i++ < length) {
+          while (i++ <= length) {
             _results.push([startY, startX - i]);
           }
           return _results;
         })();
+        $find(this.body[0]).addClass("head");
+        return this.game.life.list[this.body.pop().join()] = true;
       };
 
       Snake.prototype.north = function() {
         if (this.dir[0] !== 1) {
           this.nextDir = [-1, 0];
-          return this.game.timelessUpdate();
+          return this.game.update();
         }
       };
 
       Snake.prototype.south = function() {
         if (this.dir[0] !== -1) {
           this.nextDir = [1, 0];
-          return this.game.timelessUpdate();
+          return this.game.update();
         }
       };
 
       Snake.prototype.east = function() {
         if (this.dir[1] !== -1) {
           this.nextDir = [0, 1];
-          return this.game.timelessUpdate();
+          return this.game.update();
         }
       };
 
       Snake.prototype.west = function() {
         if (this.dir[1] !== 1) {
           this.nextDir = [0, -1];
-          return this.game.timelessUpdate();
+          return this.game.update();
         }
       };
 
@@ -146,6 +154,8 @@
         } else {
           this.game.life.list[this.body.pop().join()] = true;
         }
+        $find(this.body[0]).removeClass("head");
+        $find(next).addClass("head");
         this.dir = this.nextDir;
         return this.body.unshift(next);
       };
@@ -162,7 +172,13 @@
       Life.prototype.patterns = {
         glider: [[0, 1], [1, 2], [2, 0], [2, 1], [2, 2]],
         rPentonimo: [[0, 1], [0, 2], [1, 0], [1, 1], [2, 1]],
-        shortTable: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2]]
+        shortTable: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2]],
+        zHexomino: [[0, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 2]],
+        stairstepHexomino: [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2], [2, 3]],
+        blockAndGlider: [[0, 0], [0, 1], [1, 0], [1, 2], [2, 2], [2, 3]],
+        century: [[0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [2, 1]],
+        thunderbird: [[0, 0], [0, 1], [0, 2], [2, 1], [3, 1], [4, 1]],
+        herschelParent: [[0, 2], [1, 0], [1, 1], [2, 2], [2, 4], [3, 4]]
       };
 
       Life.prototype.pickPattern = function() {
@@ -260,49 +276,61 @@
     Game = (function() {
       function Game(size) {
         this.size = size;
-        this.turnCount = this.score = this.appleCount = 0;
-        this.framesPerMinute = 1;
-        this.timeless = true;
+        this.score = this.turnCount = this.washCount = this.appleCount = 0;
         this.$cells = $('li');
-        this.tankSize = 4;
+        this.tankSize = 5;
         this.waterLevel = 5;
-        this.snake = new Snake(this, 5);
         this.life = new Life(this);
+        this.snake = new Snake(this, 5);
         this.addApple();
         this.render();
       }
 
-      Game.prototype.toggleTime = function() {
-        this.timeless = !this.timeless;
-        if (!this.timeless) {
-          return this.rampUpRunning;
+      Game.prototype.togglePause = function() {
+        if (this.paused) {
+          $("html").off("keydown");
+          bindKeys(this);
+          bindMouse(this);
+          $('#pause-modal').hide();
+        } else {
+          $('#pause-modal').show();
+          $("html").off("mousedown").off("keydown");
+          $('html').on({
+            keydown: function(event) {
+              event.preventDefault();
+              if (event.keyCode === 32 || event.keyCode === 80) {
+                return game.togglePause();
+              }
+            }
+          });
         }
+        return this.paused = !this.paused;
       };
-
-      Game.prototype.timelessUpdate = function() {
-        if (this.timeless) {
-          return this.update();
-        }
-      };
-
-      Game.prototype.rampUpRunning = function() {};
 
       Game.prototype.update = function() {
-        this.life.update();
-        this.snake.update();
-        this.render();
         $("li").off("mouseenter");
         this.turnCount += 1;
         this.boringTurnStreak += 1;
-        if (this.turnCount % 5 === 0) {
-          return this.waterLevel = _.min([this.waterLevel + 1, this.tankSize]);
+        if (this.turnCount % 3 === 0) {
+          this.waterLevel = _.min([this.waterLevel + 1, this.tankSize]);
         }
+        this.life.update();
+        this.snake.update();
+        return this.render();
       };
 
       Game.prototype.render = function() {
-        $(".score").html(" " + this.score);
+        this.updateScores();
         this.renderWaterTank();
         return this.updateClass();
+      };
+
+      Game.prototype.updateScores = function() {
+        if (this.turnCount) {
+          this.score += 1;
+          $('.total-score .score').text(this.score);
+          return $('.turn-count .score').text(this.turnCount);
+        }
       };
 
       Game.prototype.renderWaterTank = function() {
@@ -322,26 +350,15 @@
             break;
           }
         }
-        this.score += this.getAddedScore();
-        this.appleCount += 1;
-        this.tankSize += 1;
         this.apple = coord;
         this.boringTurnStreak = this.appleCount;
-        return $find(this.apple).addClass("apple");
-      };
-
-      Game.prototype.getAddedScore = function() {
-        var timeMod;
-        timeMod = Math.pow(this.getTimeModifier(), 2) + 1;
-        return Math.pow(Math.floor(this.appleCount * timeMod), 2);
-      };
-
-      Game.prototype.getTimeModifier = function() {
-        if (this.timeless) {
-          return 0;
-        } else {
-          return this.framesPerMinute;
+        $find(this.apple).addClass("apple");
+        if (this.appleCount) {
+          this.score += Math.pow(this.appleCount, 2) + 50;
+          this.tankSize += 1;
+          $('.apple-count .score').text(this.appleCount);
         }
+        return this.appleCount += 1;
       };
 
       Game.prototype.updateClass = function() {
@@ -385,6 +402,10 @@
         if (this.life.has(cell)) {
           this.kill(node, cell);
           this.waterLevel -= 1;
+          this.washCount += 1;
+          this.score += 10;
+          $('.flame-count .score').text(this.washCount);
+          $('.total-score .score').text(this.score);
           return this.renderWaterTank();
         }
       };

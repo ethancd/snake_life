@@ -1,18 +1,54 @@
-@back: #fff;
-@gray: #fafafa;
+@back: #000;
+@gray: #eee;
 @fore: #666;
-@life: #f00;
+@fire: #f00;
 @snake: #00b800;
 @water: #00f;
 @ice: #0ff;
+@gold: #ffd700;
 
-@life-fade: 500ms;
-@game-size: 480px;
-@game-margin: 20px;
-@wrap-width: 1000px;
+.responsive(@screen-width, @screen-height, @inner-size, @font-size: 60px) {
+  @tile-size: @inner-size / 16;
 
+  @media only screen and (min-width: @screen-width) and (min-height: @screen-height) {
+    section, header {
+      width: @inner-size + 2px;
+    }
 
-html, body, article, button, input, form, h1, h2, h3, ul, ol, li, p {
+    h1 {
+      font-size: @font-size;
+    }
+
+    #water-tank {
+      height: @inner-size * 0.75;
+      width: @tile-size;
+      top: @tile-size * 2;
+      left: -2 * @tile-size;
+    }
+
+    .counts {
+      top: @tile-size * 2;
+      left: @inner-size + @tile-size;
+    }
+
+    #board {
+      width: @inner-size;
+      height: @inner-size;
+
+      li {
+        width: @tile-size;
+        height: @tile-size;
+
+        &:hover {
+          width: @tile-size - 2px;
+          height: @tile-size - 2px;
+        }
+      }
+    }
+  }
+}
+
+html, body, article, section, button, input, form, h1, h2, h3, ul, ol, li, p {
   margin: 0;
   padding: 0;
   border: 0;
@@ -21,7 +57,7 @@ html, body, article, button, input, form, h1, h2, h3, ul, ol, li, p {
 }
 
 .hidden {
-  opacity: 0 !important;
+  visibility: hidden !important;
 }
 
 .gone {
@@ -33,96 +69,113 @@ body {
   color: @fore;
 }
 
-.wrap {
-  position: relative;
-  width: @wrap-width;
-  margin: auto;
-}
-
-.text-shadow (@color; @blur: 20px) {
-  text-shadow: 0px 0px @blur @color;
-}
-
-.box-shadow (@color; @blur: 20px){
-  background-color: @color;
-  box-shadow: 0px 0px @blur @color;
-}
-
-.no-box-shadow {
-  box-shadow: 0px 0px 0px #000 !important;
-}
-
-.fader (@time: 0.2s; @opacity: 1.0; @method: ease;){
-  -webkit-transition: opacity @time @method;
-  transition: opacity @time @method;
-  opacity: @opacity;
-}
-
 header {
-  h1 {
-    width: 660px;
-    margin: 20px 0px 0px 90px;
-    text-align: center;
-    font-size: 200%;
+  width: 482px;
+  margin: auto;
 
-    .snake {
-      color: @snake;
-    }
-
-    .life {  
-      color: @life;
-      .text-shadow(@life);
-    }
-  }
-
-  h2 {
-    font-size: 200%;
-
-    strong {
-      font-size: 150%;
-      color: @water;
-      .text-shadow(@water);
-    }
-
-    em {
-      color: @snake;
-      font-size: 60%;
-    }
-  }
-
-  h3 {
-    font-size: 150%;
-    color: @fore;
-
-    strong {
-      font-size: 120%;
-      color: @life;
-      .text-shadow(@life);
-    }
-  }
-
-  button {   
-    color: @fore;
-    margin: 10px 0px;
-    .box-shadow(@water);
-    border-radius: 5px;
-    cursor: pointer;
-
-    &:hover, &:focus {
-      outline: none;
-      .box-shadow(@snake);
-    }
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
   }
 }
 
-ul {
-  margin: -50px auto 0 auto;
-  left: 100px;
+section {
+  width: 482px;
+  margin: auto;
+  position: relative;
+}
+
+h1 {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  font-size: 60px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+.counts {
+  position: absolute;
+  top: 60px;
+  left: 570px;
+  min-width: 130px;
+}
+
+.count {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.total-score {
+ .count;
+  .score {
+    color: #111;
+  }
+}
+
+.apple-count {
+  .count;
+  .score {
+    color: darken(@gold, 10%);
+  }
+}
+
+.flame-count {
+  .count;
+  .score {
+    color: darken(@water, 10%);
+  }
+}
+
+.turn-count {
+  .count;
+  .score {
+    color: darken(@snake, 10%);
+  }
+}
+
+.score {
+  display: inline-block;
+  float: left;
+  margin-right: 8px;
+}
+
+#pause-modal {
+  top: 0; right: 0; bottom: 0; left: 0;
+  position: absolute;
+  text-align: center;
+  background-color: rgba(192, 192, 192, 0.8);
+  display: none;
+}
+
+#water-tank {
+  position: absolute;
+  left: 20px;
+  top: 60px;
+  height: 360px;
+  width: 30px;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 3px solid #999;
+}
+
+#water-level {
+  background-color: @water;
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+#board {
+  margin: auto;
   list-style: none;
   background-color: @back;
   border: 1px solid @snake;
-  width: @game-size;
-  height: @game-size;
+  width: 480px;
+  height: 480px;
 
   li {
     float: left;
@@ -130,44 +183,51 @@ ul {
     width: 30px;
     height: 30px;
     border-radius: 5px;
-    opacity: 0;
 
     &:hover {
-      border: 1px solid @life;
+      border: 1px solid @ice;
       width: 28px;
       height: 28px;
-      opacity: 1;
-    }
-
-    &.apple, &.water {
-      opacity: 1;
-    }
-
-    &.apple {
-      background: url("images/apple.png");
-      background-position: 2px 0px;
-      background-size: auto 30px;
-      background-repeat: no-repeat;
-
-      &:hover {
-        background-position: 1px -1px;
-      }
-    }
-
-    &.snake {
-      background-color: @snake;
-    }
-
-    &.living {
-      background-color: @life;
-
-      &:hover {
-        border: 1px solid @ice;
-      }
-    }
-
-    &.water {
-      background-color: @water;
     }
   }
+
+  .apple {
+    background-color: @gold;
+    border-radius: 30px;
+    box-shadow: 0 0 8px @gold;
+  }
+
+  .snake {
+    background-color: @snake;
+  }
+
+  .head {
+    background-color: darken(@snake, 10%);
+    border-radius: 5px;
+    box-shadow: 0 0 2px @snake;
+  }
+
+  .living {
+    background-color: @fire;
+    border-radius: 5px;
+  }
+
+  .water {
+    background-color: @water;
+    border-radius: 5px;
+  }
 }
+
+.responsive(0, 0, 64px, 16px);
+.responsive(200px, 178px, 128px, 16px);
+.responsive(300px, 242px, 192px, 24px);
+.responsive(400px, 306px, 256px, 36px);
+.responsive(500px, 395px, 320px, 48px);
+.responsive(600px, 459px, 384px, 48px);
+.responsive(700px, 548px, 448px);
+.responsive(800px, 612px, 512px);
+.responsive(900px, 676px, 576px);
+.responsive(1000px, 740px, 640px);
+.responsive(1100px, 804px, 704px);
+.responsive(1200px, 868px, 768px);
+.responsive(1300px, 932px, 832px);

@@ -1,7 +1,7 @@
 window.Program = do ->
 
   start = ->
-    game.gameOver() if game?
+    return if game?
 
     resetInfo()
     populateBoard(16)
@@ -10,8 +10,8 @@ window.Program = do ->
     bindMouse(game)
     bindKeys(game)
 
-  resetInfo = (music) ->
-    $(".running-score").removeClass("hidden gone")
+  resetInfo = () ->
+    $(".score").text("0")
 
   populateBoard = (size) ->
     $board = $("#board");
@@ -23,6 +23,7 @@ window.Program = do ->
 
   bindMouse = (game) ->
     $("html").on "mousedown", (event) ->
+      do event.preventDefault
       game.wash(event) if event.target.tagName is "LI"
       $("li").on "mouseenter", game.wash.bind(game)
       $("html").on "mouseup", -> $("li").off("mouseenter")
@@ -30,12 +31,15 @@ window.Program = do ->
   bindKeys = (game) ->
     $('html').on keydown:
       (event) ->
+        if event.keyCode in [32, 37, 38, 39, 40, 65, 68, 80, 83, 87]
+          do event.preventDefault
+
         switch event.keyCode
           when 38, 87 then do game.snake.north
           when 37, 65 then do game.snake.west
           when 40, 83 then do game.snake.south
           when 39, 68 then do game.snake.east
-          when 32 then do game.toggleTime
+          when 32, 80 then do game.togglePause
 
   $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
@@ -50,28 +54,31 @@ window.Program = do ->
       startX = 6
 
       i = -1 
-      @body = while (i++ < length)
+      @body = while (i++ <= length)
         [startY, startX - i]
+
+      $find(@body[0]).addClass("head")
+      @game.life.list[@body.pop().join()] = true
 
     north: ->
       if @dir[0] isnt 1
         @nextDir = [-1, 0]
-        do @game.timelessUpdate
+        do @game.update
 
     south: -> 
       if @dir[0] isnt -1
         @nextDir = [ 1, 0]
-        do @game.timelessUpdate
+        do @game.update
 
     east: -> 
       if @dir[1] isnt -1
         @nextDir = [ 0, 1] 
-        do @game.timelessUpdate
+        do @game.update
 
     west: -> 
       if @dir[1] isnt 1
         @nextDir = [ 0,-1] 
-        do @game.timelessUpdate
+        do @game.update
 
     has: (coord) -> 
       (return true if coord.join() is part.join()) for part in @body
@@ -92,6 +99,9 @@ window.Program = do ->
       else
         @game.life.list[@body.pop().join()] = true
 
+      $find(@body[0]).removeClass("head")
+      $find(next).addClass("head")
+
       @dir = @nextDir
       @body.unshift(next)
 
@@ -102,7 +112,13 @@ window.Program = do ->
     patterns: {
       glider: [[0, 1], [1, 2], [2, 0], [2, 1], [2, 2]],
       rPentonimo: [[0, 1], [0, 2], [1, 0], [1, 1], [2, 1]],
-      shortTable: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2]]
+      shortTable: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2]],
+      zHexomino: [[0, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 2]],
+      stairstepHexomino: [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2], [2, 3]],
+      blockAndGlider: [[0, 0], [0, 1], [1, 0], [1, 2], [2, 2], [2, 3]],
+      century: [[0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [2, 1]],
+      thunderbird: [[0, 0], [0, 1], [0, 2], [2, 1], [3, 1], [4, 1]],
+      herschelParent: [[0, 2], [1, 0], [1, 1], [2, 2], [2, 4], [3, 4]]
     }
 
     pickPattern: ->
@@ -161,46 +177,54 @@ window.Program = do ->
 
   class Game
     constructor: (@size) ->
-      @turnCount = @score = @appleCount = 0
-      @framesPerMinute = 1
-      @timeless = true
+      @score = @turnCount = @washCount = @appleCount = 0
       @$cells = $('li')
-      @tankSize = 4
+      @tankSize = 5
       @waterLevel = 5
 
-      @snake = new Snake(@, 5)
       @life = new Life(@)
+      @snake = new Snake(@, 5)
 
       do @addApple
       do @render
 
-    toggleTime: ->
-      @timeless = not @timeless
+    togglePause: ->
+      if @paused
+        $("html").off("keydown")
+        bindKeys(@)
+        bindMouse(@)
+        do $('#pause-modal').hide
+      else
+        do $('#pause-modal').show
+        $("html").off("mousedown").off("keydown")
+        $('html').on keydown:
+          (event) ->
+            do event.preventDefault
+            do game.togglePause if event.keyCode == 32 || event.keyCode == 80
 
-      @rampUpRunning unless @timeless
-
-    timelessUpdate: ->
-      if @timeless then do @update
-
-    rampUpRunning: ->
-      #get game speed back up to "actual" fPM without being jarring
+      @paused = !@paused
 
     update: ->
+      $("li").off("mouseenter")
+      @turnCount += 1
+      @boringTurnStreak += 1
+      if @turnCount % 3 == 0
+        @waterLevel = _.min([@waterLevel + 1, @tankSize])
+
       do @life.update
       do @snake.update
       do @render
 
-      $("li").off("mouseenter")
-
-      @turnCount += 1
-      @boringTurnStreak += 1
-      if @turnCount % 5 == 0
-        @waterLevel = _.min([@waterLevel + 1, @tankSize])
-
     render: ->
-      $(".score").html(" " + @score)
+      do @updateScores
       do @renderWaterTank
       do @updateClass
+
+    updateScores: ->
+      if @turnCount
+        @score += 1
+        $('.total-score .score').text(@score)
+        $('.turn-count .score').text(@turnCount)
 
     renderWaterTank: -> 
       percentageHeight = 1 - (@waterLevel / @tankSize)
@@ -219,19 +243,16 @@ window.Program = do ->
                 @life.has(coord)
           break
 
-      @score += do @getAddedScore
-      @appleCount += 1
-      @tankSize += 1
       @apple = coord
       @boringTurnStreak = @appleCount
       $find(@apple).addClass("apple")
 
-    getAddedScore: -> 
-      timeMod = Math.pow(@getTimeModifier(), 2) + 1
-      Math.pow(Math.floor(@appleCount * timeMod), 2)
+      if @appleCount
+        @score += (Math.pow(@appleCount, 2) + 50 )
+        @tankSize += 1
+        $('.apple-count .score').text(@appleCount)
 
-    getTimeModifier: ->
-      if @timeless then 0 else @framesPerMinute
+      @appleCount += 1
 
     updateClass: ->
       @$cells.removeClass("water")
@@ -264,6 +285,10 @@ window.Program = do ->
       if @life.has(cell)
         @kill(node, cell)
         @waterLevel -= 1
+        @washCount += 1
+        @score += 10
+        $('.flame-count .score').text(@washCount)
+        $('.total-score .score').text(@score)
         do @renderWaterTank
         
     kill: (node, cell) ->

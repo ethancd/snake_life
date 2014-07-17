@@ -5,33 +5,49 @@
 
   <link href='/snake_life/favicon.ico' rel="shortcut icon" type="image/vnd.microsoft.icon">
   <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet/less" type="text/css" href="style.less">
 
   <!--script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script-->
   <script>window.jQuery || document.write('<script src="libs/jquery-1.10.2.min.js"><\/script>')</script>
   <script src="libs/underscore-min.js"></script>
+  <script src="libs/less-1.4.1.min.js"></script>
   <script src="ninia.js"></script>
 </head>
 <body>
-  <div class="modal shade gone"></div>
 
-    <header class="wrap">
-      <h1><strong class="snake">Snake</strong> on <strong class="life">Fire</strong></h1>
-      <h2 class="running-score hidden">
-        Score: <strong class="score">0</strong><em class="potential"></em>
-      </h2>
+  <header>
+    <h1>Snake on Fire</h1>
+  </header>
 
-      <form action="" id="new-game">
-        <input type="submit" value="New Game">
-      </form>
-    </header>
-
-  <section class="wrap">
+  <section>
     <div id="water-tank">
       <div id="water-level"></div>
     </div>
+
     <ul id="board">
     </ul>
+
+    <div class="counts">
+      <h2 class="total-score">
+        <strong class="score">0</strong> Points
+      </h2>
+      <h3 class="apple-count">
+        <strong class="score">0</strong> Apples Eaten
+      </h3>
+      <h3 class="flame-count">
+        <strong class="score">0</strong> Flames Licked
+      </h3>
+      <h3 class="turn-count">
+        <strong class="score">0</strong> Turns Survived
+      </h3>
+    </div>
+
+    <div id="pause-modal">
+      Press 'P' or Spacebar to resume
+    </div>
   </section>
+
+  <form id="new-game"></form>
   <script>
   $(function(){
     $("html").on("keypress", function(event){
@@ -44,6 +60,8 @@
       event.preventDefault();
       Program.start();
     }) 
+
+    Program.start();
   })
   </script>
 </body>
