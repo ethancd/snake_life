@@ -99,6 +99,21 @@
     bindMouse = function(game) {
       return $("html").on("mousedown", function(event) {
         event.preventDefault();
+        if (event.target.tagName === "BUTTON") {
+          switch ($(event.target).attr('id')) {
+            case "up":
+              game.snake.north();
+              break;
+            case "left":
+              game.snake.west();
+              break;
+            case "down":
+              game.snake.south();
+              break;
+            case "right":
+              game.snake.east();
+          }
+        }
         if (event.target.tagName === "LI") {
           game.wash(event);
         }

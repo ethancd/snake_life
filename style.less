@@ -34,6 +34,19 @@
       margin-top: @tile-size * 2;
     }
 
+    .buttons {
+      bottom: -@tile-size * 2;
+
+      button {
+        width: @tile-size * 2;
+        height: @tile-size * 2; 
+        font-size: @tile-size;
+        line-height: @tile-size / 2;
+        margin-left: @tile-size * 8 / 3;
+        border-radius: @tile-size / 6;
+      }
+    }
+
     #board {
       width: @inner-size;
       height: @inner-size;
@@ -149,6 +162,30 @@ h2 {
   float: left;
   margin-right: 8px;
 }
+
+.buttons {
+  position: absolute;
+  bottom: -48px;
+  width: 100%;
+
+  button {
+    background-color: #ddd;
+    float: left;
+    width: 48px;
+    height: 48px;
+    font-size: 36px;
+    line-height: 16px;
+    font-weight: bold;
+    margin-left: 64px;
+    border-radius: 8px;
+    cursor: pointer;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
 
 #modal {
   top: 0; right: 0; bottom: 0; left: 0;

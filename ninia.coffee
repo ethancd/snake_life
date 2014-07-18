@@ -79,6 +79,14 @@ window.Program = do ->
   bindMouse = (game) ->
     $("html").on "mousedown", (event) ->
       do event.preventDefault
+
+      if event.target.tagName is "BUTTON"
+        switch $(event.target).attr('id')
+          when "up" then do game.snake.north
+          when "left" then do game.snake.west
+          when "down" then do game.snake.south
+          when "right" then do game.snake.east
+
       game.wash(event) if event.target.tagName is "LI"
       $("li").on "mouseenter", game.wash.bind(game)
       $("html").on "mouseup", -> $("li").off("mouseenter")
