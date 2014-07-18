@@ -1,6 +1,5 @@
-@back: #000;
-@gray: #eee;
-@fore: #666;
+@import url(http://fonts.googleapis.com/css?family=Titillium+Web:700,400);
+
 @fire: #f00;
 @snake: #00b800;
 @water: #00f;
@@ -31,6 +30,10 @@
       left: @inner-size + @tile-size;
     }
 
+    .message {
+      margin-top: @tile-size * 2;
+    }
+
     #board {
       width: @inner-size;
       height: @inner-size;
@@ -38,10 +41,15 @@
       li {
         width: @tile-size;
         height: @tile-size;
+        border-radius: @tile-size / 6;
 
         &:hover {
           width: @tile-size - 2px;
           height: @tile-size - 2px;
+        }
+
+        &.head, &.living, &.water {
+          border-radius: @tile-size / 6;
         }
       }
     }
@@ -53,7 +61,7 @@ html, body, article, section, button, input, form, h1, h2, h3, ul, ol, li, p {
   padding: 0;
   border: 0;
   font-size: 100%;
-  font-family: sans-serif;
+  font-family: 'Titillium Web', sans-serif;
 }
 
 .hidden {
@@ -65,8 +73,8 @@ html, body, article, section, button, input, form, h1, h2, h3, ul, ol, li, p {
 }
 
 body {
-  background-color: @gray;
-  color: @fore;
+  background-color: #222;
+  color: #eee;
 }
 
 header {
@@ -101,39 +109,38 @@ h2 {
   position: absolute;
   top: 60px;
   left: 570px;
-  min-width: 130px;
+  min-width: 200px;
 }
 
 .count {
-  color: #333;
   margin-bottom: 10px;
 }
 
 .total-score {
  .count;
   .score {
-    color: #111;
+    color: #fff;
   }
 }
 
 .apple-count {
   .count;
   .score {
-    color: darken(@gold, 10%);
+    color: lighten(@gold, 10%);
   }
 }
 
 .flame-count {
   .count;
   .score {
-    color: darken(@water, 10%);
+    color: @ice;
   }
 }
 
 .turn-count {
   .count;
   .score {
-    color: darken(@snake, 10%);
+    color: lighten(@snake, 10%);
   }
 }
 
@@ -143,12 +150,63 @@ h2 {
   margin-right: 8px;
 }
 
-#pause-modal {
+#modal {
   top: 0; right: 0; bottom: 0; left: 0;
   position: absolute;
   text-align: center;
-  background-color: rgba(192, 192, 192, 0.8);
+  background-color: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  transition: 1s opacity;
+}
+
+.message {
+  margin-top: 60px;
+  font-size: 24px;
+  color: #000;
+
+  &.game-over {
+    font-size: 36px;
+    font-weight: bold;
+  }
+
+  .fire {
+    color: darken(@fire, 10%);
+    font-weight: bold;
+  }
+
+  .water {
+    color: darken(@water, 10%);
+    font-weight: bold;
+  }
+
+  .snake {
+    color: darken(@snake, 10%);
+    font-weight: bold;
+  }
+
+  .apple {
+    color: @gold;
+    text-shadow: 0 0 2px @gold;
+  }
+}
+
+#new-game {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  margin: auto;
+  width: 120px;
+  height: 50px;
+  text-align: center;
   display: none;
+  color: #000;
+
+  input {
+    background-color: #ffa500;
+    border-radius: 3px;
+    cursor: pointer;
+    display: block;
+    margin: auto;
+  }
 }
 
 #water-tank {
@@ -159,7 +217,7 @@ h2 {
   width: 30px;
   overflow: hidden;
   border-radius: 20px;
-  border: 3px solid #999;
+  border: 3px solid #333;
 }
 
 #water-level {
@@ -172,7 +230,7 @@ h2 {
 #board {
   margin: auto;
   list-style: none;
-  background-color: @back;
+  background-color: #000;
   border: 1px solid @snake;
   width: 480px;
   height: 480px;

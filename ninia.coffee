@@ -9,6 +9,12 @@ window.Program = do ->
 
     bindMouse(game)
     bindKeys(game)
+    if window.returningPlayer
+      $('#modal').hide()
+      $('#new-game').hide()
+      $('#modal').find('.message').removeClass('game-over')
+    else
+      runIntro()
 
   resetInfo = () ->
     $(".score").text("0")
@@ -21,6 +27,55 @@ window.Program = do ->
       for j in [0...size]
         $board.append("<li id='row-#{i}-col-#{j}'></li>")
 
+  runIntro = ->
+    window.invincible = window.returningPlayer = true
+    setTimeout(->
+      showInstructions(0)
+    , 1)
+
+  showInstructions = (slideNumber) ->
+    $modal = $('#modal')
+    instructions = [
+      "Press W-A-S-D or ↑ ← ↓ → to move",
+      "Avoid #{spanify('flames', 'fire')} and #{spanify('body parts', 'snake')} (edges are okay, you just wrap around)",
+      "Click and drag to douse #{spanify('flames', 'fire')}, but watch your #{spanify('water', 'water')} supply",
+      "Have fun, eat #{spanify('apples', 'apple')}, and don't die!"
+    ]
+
+    unless instructions[slideNumber]
+      window.invincible = false
+      $('html').off("keyup.intro click.intro")
+      $modal.css('opacity': 0)
+      $modal.hide()
+      return
+
+    $modal.find('.message').html(instructions[slideNumber])
+    $modal.css('opacity': 1)
+    setTimeout(->
+      $('html').on "keyup.intro click.intro": ->
+        $modal.css('opacity': 0)
+        setTimeout( ->
+          $('html').off("keyup.intro click.intro")
+          showInstructions(slideNumber + 1)
+        , 1000)
+    , 1000)
+
+  spanify = (text, klass) ->
+    "<span class='#{klass}'>#{text}</span>"
+
+  showGameOverScreen = ->
+    $modal = $("#modal")
+    $newGameButton = $('#new-game')
+    gameOverMessage = "&#9760; Game Over! &#9760;"
+    $modal.css('opacity': 0)
+    $modal.show()
+
+    setTimeout(->
+      $modal.find('.message').addClass('game-over').html(gameOverMessage)
+      $modal.css('opacity': 1)
+      $newGameButton.show()
+    , 1)
+
   bindMouse = (game) ->
     $("html").on "mousedown", (event) ->
       do event.preventDefault
@@ -31,7 +86,7 @@ window.Program = do ->
   bindKeys = (game) ->
     $('html').on keydown:
       (event) ->
-        if event.keyCode in [32, 37, 38, 39, 40, 65, 68, 80, 83, 87]
+        if event.keyCode in [37, 38, 39, 40, 65, 68, 83, 87]
           do event.preventDefault
 
         switch event.keyCode
@@ -39,7 +94,6 @@ window.Program = do ->
           when 37, 65 then do game.snake.west
           when 40, 83 then do game.snake.south
           when 39, 68 then do game.snake.east
-          when 32, 80 then do game.togglePause
 
   $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
@@ -91,7 +145,7 @@ window.Program = do ->
     update: ->
       next = do @getNext
 
-      if @has(next) or @game.life.has(next)
+      if not window.invincible and (@has(next) or @game.life.has(next))
         do @game.gameOver 
       else if @game.apple? and next.join() is @game.apple.join()
         $find(next).removeClass("apple")
@@ -188,22 +242,6 @@ window.Program = do ->
       do @addApple
       do @render
 
-    togglePause: ->
-      if @paused
-        $("html").off("keydown")
-        bindKeys(@)
-        bindMouse(@)
-        do $('#pause-modal').hide
-      else
-        do $('#pause-modal').show
-        $("html").off("mousedown").off("keydown")
-        $('html').on keydown:
-          (event) ->
-            do event.preventDefault
-            do game.togglePause if event.keyCode == 32 || event.keyCode == 80
-
-      @paused = !@paused
-
     update: ->
       $("li").off("mouseenter")
       @turnCount += 1
@@ -271,10 +309,8 @@ window.Program = do ->
 
     gameOver: ->
       $("html").off("mousedown").off("keydown")
-
-      if window.handler?
-        clearInterval(handler)
-
+      $('html').off("keyup.intro click.intro")
+      do showGameOverScreen
       window.game = null
      
     wash: (event) ->

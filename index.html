@@ -4,7 +4,7 @@
   <title>Snake on Fire</title>
 
   <link href='/snake_life/favicon.ico' rel="shortcut icon" type="image/vnd.microsoft.icon">
-  <link rel="stylesheet" type="text/css" href="style.css">
+  <!--link rel="stylesheet" type="text/css" href="style.css"-->
   <link rel="stylesheet/less" type="text/css" href="style.less">
 
   <!--script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script-->
@@ -42,12 +42,15 @@
       </h3>
     </div>
 
-    <div id="pause-modal">
-      Press 'P' or Spacebar to resume
+    <div id="modal">
+      <div class="message"></div>
     </div>
-  </section>
 
-  <form id="new-game"></form>
+    <form id="new-game">
+      <input type="submit" value="Try Again →">
+      <span>(or hit 'Enter')</span>
+    </form>
+  </section>
   <script>
   $(function(){
     $("html").on("keypress", function(event){
