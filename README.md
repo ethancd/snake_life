@@ -1,15 +1,17 @@
-Snake/Life
+Snake on Fire
 ==========
 
-What does <a href="http://en.wikipedia.org/wiki/Snake_(video_game)">an iconic mobile video game</a> have in common with 
-<a href="http://en.wikipedia.org/wiki/Conway%27s_game_of_life">a cellular automaton generator</a>?
-This project. (Also, both originated in the 70's)
+They took away your family. They took away your apples. And now, they've set your world on *fire*.
 
-Use the arrow or WASD keys to move your snake around the board collecting 
-apples, while being careful to avoid walls, the snake body, or the fire of life 
-raging around you. You can also click and drag your mouse through spaces to
-toggle whether they're alive -- useful when you need to disrupt a dangerous
-formation.
+In this heavily pixelated thriller, you play as <a href="http://en.wikipedia.org/wiki/Snake_(video_game)">Snake</a>, a vigilante with nothing left to lose on an urban rampage through a <a href="http://en.wikipedia.org/wiki/Conway%27s_game_of_life">deterministic cellular automaton</a>
+
+
+Updates
+=======
+- A full redesign, with an emphasis on simplicity and accessibility. 
+- Fire only advances when you move, which lends the game a more tactical and low-pressure feel.
+
+
 
 Technologies
 ============
@@ -17,12 +19,4 @@ Technologies
 * JavaScript
 * jQuery
 * CoffeeScript
-* CSS
-* LESS.js
-* Firebase
-
-TODO
-====
-
-* Figure out what's up with the Firefox version?
-* Test in other browsers
+* Less/CSS
