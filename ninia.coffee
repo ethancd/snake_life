@@ -37,7 +37,7 @@ window.Program = do ->
     $modal = $('#modal')
     instructions = [
       "Press W-A-S-D or ↑ ← ↓ → to move",
-      "Avoid #{spanify('flames', 'fire')} and #{spanify('body parts', 'snake')} (edges are okay, you just wrap around)",
+      "Don't let your #{spanify('head', 'head')} get caught on #{spanify('fire', 'fire')}, or run into your #{spanify('body', 'snake')} (edges are okay, you just wrap around)",
       "Click and drag to douse #{spanify('flames', 'fire')}, but watch your #{spanify('water', 'water')} supply",
       "Have fun, eat #{spanify('apples', 'apple')}, and don't die!"
     ]
@@ -120,7 +120,8 @@ window.Program = do ->
         [startY, startX - i]
 
       $find(@body[0]).addClass("head")
-      @game.life.list[@body.pop().join()] = true
+      @torch = @body.pop()
+      @game.life.list[@torch.join()] = "supertrue"
 
     north: ->
       if @dir[0] isnt 1
@@ -159,7 +160,9 @@ window.Program = do ->
         $find(next).removeClass("apple")
         do @game.addApple 
       else
-        @game.life.list[@body.pop().join()] = true
+        @torch = @body.pop()
+        
+      @game.life.list[@torch.join()] = "supertrue"
 
       $find(@body[0]).removeClass("head")
       $find(next).addClass("head")
@@ -216,10 +219,10 @@ window.Program = do ->
 
       cells = for shift in do @pickPattern
         do (shift) ->
-          [shift[0] + coord[0],
-           shift[1] + coord[1]]
+          [@game.wrap(shift[0] + coord[0]),
+           @game.wrap(shift[1] + coord[1])]
 
-      @list[cell.join()] = true for cell in cells
+      @list[cell.join()] = "supertrue" for cell in cells
       @game.boringTurnStreak = 0
 
     countLiving: (cell) -> 
@@ -241,8 +244,7 @@ window.Program = do ->
     constructor: (@size) ->
       @score = @turnCount = @washCount = @appleCount = 0
       @$cells = $('li')
-      @tankSize = 5
-      @waterLevel = 5
+      @waterLevel = @tankSize = 5
 
       @life = new Life(@)
       @snake = new Snake(@, 5)
@@ -304,6 +306,7 @@ window.Program = do ->
       @$cells.removeClass("water")
       @$cells.removeClass("snake")
       @$cells.removeClass("living")
+      @$cells.removeClass("super-hot")
 
       for cell in @$cells
         cellArr = cell.id.split("-")
@@ -314,6 +317,8 @@ window.Program = do ->
 
         if @life.has(coord)
           $(cell).addClass("living")
+          if @life.has(coord) is "supertrue"
+            $(cell).addClass("super-hot")
 
     gameOver: ->
       $("html").off("mousedown").off("keydown")

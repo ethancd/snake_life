@@ -5,6 +5,7 @@
 @water: #00f;
 @ice: #0ff;
 @gold: #ffd700;
+@orange: #ffa500;
 
 .responsive(@screen-width, @screen-height, @inner-size, @font-size: 60px) {
   @tile-size: @inner-size / 16;
@@ -67,6 +68,27 @@
       }
     }
   }
+}
+
+.pulse(@base, @peak, @shadow) {
+  0% {background-color: @base; box-shadow: 0 0 4px @shadow};
+  50% {background-color: @peak; box-shadow: 0 0 8px @shadow};
+  100% {background-color: @base; box-shadow: 0 0 4px @shadow};
+}
+
+.loop-animation(@name) {
+  -webkit-animation-name: @name;
+  -webkit-animation-duration: 3s;
+  -webkit-animation-iteration-count: infinite;
+
+  animation-name: @name;
+  animation-duration: 3s;
+  animation-iteration-count: infinite;
+}
+
+.none-animation {
+  -webkit-animation-name: none;
+  animation-name: none;
 }
 
 html, body, article, section, button, input, form, h1, h2, h3, ul, ol, li, p {
@@ -217,6 +239,11 @@ h2 {
   }
 
   .snake {
+    color: @snake;
+    font-weight: bold;
+  }
+
+  .head {
     color: darken(@snake, 10%);
     font-weight: bold;
   }
@@ -238,7 +265,7 @@ h2 {
   color: #000;
 
   input {
-    background-color: #ffa500;
+    background-color: @orange;
     border-radius: 5px;
     cursor: pointer;
     display: block;
@@ -293,6 +320,10 @@ h2 {
     background-color: @gold;
     border-radius: 30px;
     box-shadow: 0 0 8px @gold;
+
+    @-webkit-keyframes apple {.pulse(@gold, lighten(@gold, 10%), @gold);}
+    @keyframes apple {.pulse(@gold, lighten(@gold, 10%), @gold);}
+    .loop-animation(apple);
   }
 
   .snake {
@@ -308,11 +339,20 @@ h2 {
   .living {
     background-color: @fire;
     border-radius: 5px;
+    .none-animation;
+
+    &.super-hot {
+      box-shadow: 0 0 4px #993CF3 ;
+      @-webkit-keyframes super-hot {.pulse(darken(@fire, 10%), lighten(@fire, 10%), #993CF3);}
+      @keyframes super-hot {.pulse(darken(@fire, 10%), lighten(@fire, 10%), #993CF3);}
+      .loop-animation(super-hot);
+    }
   }
 
   .water {
     background-color: @water;
     border-radius: 5px;
+    .none-animation;
   }
 }
 

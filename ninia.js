@@ -48,7 +48,7 @@
     showInstructions = function(slideNumber) {
       var $modal, instructions;
       $modal = $('#modal');
-      instructions = ["Press W-A-S-D or ↑ ← ↓ → to move", "Avoid " + (spanify('flames', 'fire')) + " and " + (spanify('body parts', 'snake')) + " (edges are okay, you just wrap around)", "Click and drag to douse " + (spanify('flames', 'fire')) + ", but watch your " + (spanify('water', 'water')) + " supply", "Have fun, eat " + (spanify('apples', 'apple')) + ", and don't die!"];
+      instructions = ["Press W-A-S-D or ↑ ← ↓ → to move", "Don't let your " + (spanify('head', 'head')) + " get caught on " + (spanify('fire', 'fire')) + ", or run into your " + (spanify('body', 'snake')) + " (edges are okay, you just wrap around)", "Click and drag to douse " + (spanify('flames', 'fire')) + ", but watch your " + (spanify('water', 'water')) + " supply", "Have fun, eat " + (spanify('apples', 'apple')) + ", and don't die!"];
       if (!instructions[slideNumber]) {
         window.invincible = false;
         $('html').off("keyup.intro click.intro");
@@ -172,7 +172,8 @@
           return _results;
         })();
         $find(this.body[0]).addClass("head");
-        return this.game.life.list[this.body.pop().join()] = true;
+        this.torch = this.body.pop();
+        return this.game.life.list[this.torch.join()] = "supertrue";
       };
 
       Snake.prototype.north = function() {
@@ -228,8 +229,9 @@
           $find(next).removeClass("apple");
           this.game.addApple();
         } else {
-          this.game.life.list[this.body.pop().join()] = true;
+          this.torch = this.body.pop();
         }
+        this.game.life.list[this.torch.join()] = "supertrue";
         $find(this.body[0]).removeClass("head");
         $find(next).addClass("head");
         this.dir = this.nextDir;
@@ -303,14 +305,14 @@
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             shift = _ref[_i];
             _results.push((function(shift) {
-              return [shift[0] + coord[0], shift[1] + coord[1]];
+              return [this.game.wrap(shift[0] + coord[0]), this.game.wrap(shift[1] + coord[1])];
             })(shift));
           }
           return _results;
         }).call(this);
         for (_i = 0, _len = cells.length; _i < _len; _i++) {
           cell = cells[_i];
-          this.list[cell.join()] = true;
+          this.list[cell.join()] = "supertrue";
         }
         return this.game.boringTurnStreak = 0;
       };
@@ -354,8 +356,7 @@
         this.size = size;
         this.score = this.turnCount = this.washCount = this.appleCount = 0;
         this.$cells = $('li');
-        this.tankSize = 5;
-        this.waterLevel = 5;
+        this.waterLevel = this.tankSize = 5;
         this.life = new Life(this);
         this.snake = new Snake(this, 5);
         this.addApple();
@@ -421,6 +422,7 @@
         this.$cells.removeClass("water");
         this.$cells.removeClass("snake");
         this.$cells.removeClass("living");
+        this.$cells.removeClass("super-hot");
         _ref = this.$cells;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -431,7 +433,12 @@
             $(cell).addClass("snake");
           }
           if (this.life.has(coord)) {
-            _results.push($(cell).addClass("living"));
+            $(cell).addClass("living");
+            if (this.life.has(coord) === "supertrue") {
+              _results.push($(cell).addClass("super-hot"));
+            } else {
+              _results.push(void 0);
+            }
           } else {
             _results.push(void 0);
           }
