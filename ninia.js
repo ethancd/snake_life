@@ -223,11 +223,16 @@
       Snake.prototype.update = function() {
         var next;
         next = this.getNext();
+        if (this.has(next)) {
+          if (!window.invincible && this.game.life.has(this.body[0])) {
+            this.game.gameOver();
+          } else {
+            this.game.life.list[this.torch.join()] = "supertrue";
+          }
+          return;
+        }
         if (!window.invincible && this.game.life.has(next)) {
           this.game.gameOver();
-        } else if (this.has(next)) {
-          this.game.life.list[this.torch.join()] = "supertrue";
-          return;
         } else if ((this.game.apple != null) && next.join() === this.game.apple.join()) {
           $find(next).removeClass("apple");
           this.game.addApple();

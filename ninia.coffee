@@ -155,11 +155,15 @@ window.Program = do ->
     update: ->
       next = do @getNext
 
+      if @has(next)
+        if not window.invincible and @game.life.has(@body[0])
+          do @game.gameOver 
+        else
+          @game.life.list[@torch.join()] = "supertrue"
+        return
+
       if not window.invincible and @game.life.has(next)
         do @game.gameOver 
-      else if @has(next)
-        @game.life.list[@torch.join()] = "supertrue"
-        return
       else if @game.apple? and next.join() is @game.apple.join()
         $find(next).removeClass("apple")
         do @game.addApple 
