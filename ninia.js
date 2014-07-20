@@ -48,7 +48,7 @@
     showInstructions = function(slideNumber) {
       var $modal, instructions;
       $modal = $('#modal');
-      instructions = ["Press W-A-S-D or ↑ ← ↓ → to move", "Don't let your " + (spanify('head', 'head')) + " get caught on " + (spanify('fire', 'fire')) + ", or run into your " + (spanify('body', 'snake')) + " (edges are okay, you just wrap around)", "Click and drag to douse " + (spanify('flames', 'fire')) + ", but watch your " + (spanify('water', 'water')) + " supply", "Have fun, eat " + (spanify('apples', 'apple')) + ", and don't die!"];
+      instructions = ["Press W-A-S-D or ↑ ← ↓ → to move", "Don't let your " + (spanify('head', 'snake')) + " run into the " + (spanify('flames', 'fire')), "(Bumping into your " + (spanify('body', 'snake')) + " isn't fatal, and edges are okay, you just wrap around)", "Click and drag to douse " + (spanify('flames', 'fire')) + ", but watch your " + (spanify('water', 'water')) + " supply", "Have fun, eat " + (spanify('apples', 'apple')) + ", and don't die!"];
       if (!instructions[slideNumber]) {
         window.invincible = false;
         $('html').off("keyup.intro click.intro");
@@ -223,8 +223,11 @@
       Snake.prototype.update = function() {
         var next;
         next = this.getNext();
-        if (!window.invincible && (this.has(next) || this.game.life.has(next))) {
+        if (!window.invincible && this.game.life.has(next)) {
           this.game.gameOver();
+        } else if (this.has(next)) {
+          this.game.life.list[this.torch.join()] = "supertrue";
+          return;
         } else if ((this.game.apple != null) && next.join() === this.game.apple.join()) {
           $find(next).removeClass("apple");
           this.game.addApple();
@@ -251,7 +254,7 @@
         glider: [[0, 1], [1, 2], [2, 0], [2, 1], [2, 2]],
         rPentonimo: [[0, 1], [0, 2], [1, 0], [1, 1], [2, 1]],
         shortTable: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2]],
-        zHexomino: [[0, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 2]],
+        zHexomino: [[0, 0], [0, 1], [1, 1], [2, 1], [3, 1], [3, 2]],
         stairstepHexomino: [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2], [2, 3]],
         blockAndGlider: [[0, 0], [0, 1], [1, 0], [1, 2], [2, 2], [2, 3]],
         century: [[0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [2, 1]],

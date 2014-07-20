@@ -37,7 +37,8 @@ window.Program = do ->
     $modal = $('#modal')
     instructions = [
       "Press W-A-S-D or ↑ ← ↓ → to move",
-      "Don't let your #{spanify('head', 'head')} get caught on #{spanify('fire', 'fire')}, or run into your #{spanify('body', 'snake')} (edges are okay, you just wrap around)",
+      "Don't let your #{spanify('head', 'snake')} run into the #{spanify('flames', 'fire')}",
+      "(Bumping into your #{spanify('body', 'snake')} isn't fatal, and edges are okay, you just wrap around)",
       "Click and drag to douse #{spanify('flames', 'fire')}, but watch your #{spanify('water', 'water')} supply",
       "Have fun, eat #{spanify('apples', 'apple')}, and don't die!"
     ]
@@ -154,8 +155,11 @@ window.Program = do ->
     update: ->
       next = do @getNext
 
-      if not window.invincible and (@has(next) or @game.life.has(next))
+      if not window.invincible and @game.life.has(next)
         do @game.gameOver 
+      else if @has(next)
+        @game.life.list[@torch.join()] = "supertrue"
+        return
       else if @game.apple? and next.join() is @game.apple.join()
         $find(next).removeClass("apple")
         do @game.addApple 
@@ -178,7 +182,7 @@ window.Program = do ->
       glider: [[0, 1], [1, 2], [2, 0], [2, 1], [2, 2]],
       rPentonimo: [[0, 1], [0, 2], [1, 0], [1, 1], [2, 1]],
       shortTable: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2]],
-      zHexomino: [[0, 0], [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 2]],
+      zHexomino: [[0, 0], [0, 1], [1, 1], [2, 1], [3, 1], [3, 2]],
       stairstepHexomino: [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2], [2, 3]],
       blockAndGlider: [[0, 0], [0, 1], [1, 0], [1, 2], [2, 2], [2, 3]],
       century: [[0, 2], [0, 3], [1, 0], [1, 1], [1, 2], [2, 1]],

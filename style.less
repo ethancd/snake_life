@@ -6,6 +6,7 @@
 @ice: #0ff;
 @gold: #ffd700;
 @orange: #ffa500;
+@violet: #993CF3;
 
 .responsive(@screen-width, @screen-height, @inner-size, @font-size: 60px) {
   @tile-size: @inner-size / 16;
@@ -64,6 +65,11 @@
 
         &.head, &.living, &.water {
           border-radius: @tile-size / 6;
+        }
+
+        &.living.super-hot {
+          width: @tile-size - 2px;
+          height: @tile-size - 2px;
         }
       }
     }
@@ -239,11 +245,6 @@ h2 {
   }
 
   .snake {
-    color: @snake;
-    font-weight: bold;
-  }
-
-  .head {
     color: darken(@snake, 10%);
     font-weight: bold;
   }
@@ -319,11 +320,13 @@ h2 {
   .apple {
     background-color: @gold;
     border-radius: 30px;
-    box-shadow: 0 0 8px @gold;
+    box-shadow: 0 0 16px #fff;
 
-    @-webkit-keyframes apple {.pulse(@gold, lighten(@gold, 10%), @gold);}
-    @keyframes apple {.pulse(@gold, lighten(@gold, 10%), @gold);}
-    .loop-animation(apple);
+    &:not(.living) {
+      @-webkit-keyframes apple {.pulse(@gold, lighten(@gold, 10%), #fff);}
+      @keyframes apple {.pulse(@gold, lighten(@gold, 10%), #fff);}
+      .loop-animation(apple);
+    }
   }
 
   .snake {
@@ -339,12 +342,16 @@ h2 {
   .living {
     background-color: @fire;
     border-radius: 5px;
-    .none-animation;
 
     &.super-hot {
-      box-shadow: 0 0 4px #993CF3 ;
-      @-webkit-keyframes super-hot {.pulse(darken(@fire, 10%), lighten(@fire, 10%), #993CF3);}
-      @keyframes super-hot {.pulse(darken(@fire, 10%), lighten(@fire, 10%), #993CF3);}
+      border: 1px solid @violet;
+      width: 28px;
+      height: 28px;
+
+      background-color: darken(@fire, 10%);
+      box-shadow: 0 0 8px #993CF3;
+      @-webkit-keyframes super-hot {.pulse(darken(@fire, 10%), lighten(@fire, 10%), @violet);}
+      @keyframes super-hot {.pulse(darken(@fire, 10%), lighten(@fire, 10%), @violet);}
       .loop-animation(super-hot);
     }
   }
