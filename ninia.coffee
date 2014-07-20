@@ -231,7 +231,7 @@ window.Program = do ->
            @game.wrap(shift[1] + coord[1])]
 
       @list[cell.join()] = "supertrue" for cell in cells
-      @game.boringTurnStreak = 0
+      @game.boringTurnStreak = @game.appleCount
 
     countLiving: (cell) -> 
       (nabe for nabe in @neighbors(cell) when @has(nabe)).length

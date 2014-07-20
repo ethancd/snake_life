@@ -322,7 +322,7 @@
           cell = cells[_i];
           this.list[cell.join()] = "supertrue";
         }
-        return this.game.boringTurnStreak = 0;
+        return this.game.boringTurnStreak = this.game.appleCount;
       };
 
       Life.prototype.countLiving = function(cell) {
