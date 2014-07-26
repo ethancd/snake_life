@@ -48,7 +48,7 @@
     showInstructions = function(slideNumber) {
       var $modal, instructions;
       $modal = $('#modal');
-      instructions = ["Press W-A-S-D or ↑ ← ↓ → to move", "Don't let your " + (spanify('head', 'snake')) + " run into the " + (spanify('flames', 'fire')), "(Bumping into your " + (spanify('body', 'snake')) + " isn't fatal, and edges are okay, you just wrap around)", "Click and drag to douse " + (spanify('flames', 'fire')) + ", but watch your " + (spanify('water', 'water')) + " supply", "Have fun, eat " + (spanify('apples', 'apple')) + ", and don't die!"];
+      instructions = ["Press W-A-S-D or ↑ ← ↓ → to move", "Don't let your " + (spanify('head', 'snake')) + " run into the " + (spanify('flames', 'fire')) + " (bumping into your " + (spanify('body', 'snake')) + " isn't fatal, and edges are okay, you just wrap around)", "Click and drag to douse " + (spanify('flames', 'fire')) + ", but watch your " + (spanify('water', 'water')) + " supply", "Have fun, eat " + (spanify('apples', 'apple')) + ", and don't die!"];
       if (!instructions[slideNumber]) {
         window.invincible = false;
         $('html').off("keyup.intro click.intro");
@@ -127,7 +127,7 @@
       return $('html').on({
         keydown: function(event) {
           var _ref;
-          if ((_ref = event.keyCode) === 37 || _ref === 38 || _ref === 39 || _ref === 40 || _ref === 65 || _ref === 68 || _ref === 83 || _ref === 87) {
+          if ((_ref = event.keyCode) === 32 || _ref === 37 || _ref === 38 || _ref === 39 || _ref === 40 || _ref === 65 || _ref === 68 || _ref === 83 || _ref === 87) {
             event.preventDefault();
           }
           switch (event.keyCode) {
@@ -143,6 +143,8 @@
             case 39:
             case 68:
               return game.snake.east();
+            case 32:
+              return game.toggleMotion();
           }
         }
       });
@@ -179,28 +181,36 @@
       Snake.prototype.north = function() {
         if (this.dir[0] !== 1) {
           this.nextDir = [-1, 0];
-          return this.game.update();
+          if (!this.game.inMotion) {
+            return this.game.update();
+          }
         }
       };
 
       Snake.prototype.south = function() {
         if (this.dir[0] !== -1) {
           this.nextDir = [1, 0];
-          return this.game.update();
+          if (!this.game.inMotion) {
+            return this.game.update();
+          }
         }
       };
 
       Snake.prototype.east = function() {
         if (this.dir[1] !== -1) {
           this.nextDir = [0, 1];
-          return this.game.update();
+          if (!this.game.inMotion) {
+            return this.game.update();
+          }
         }
       };
 
       Snake.prototype.west = function() {
         if (this.dir[1] !== 1) {
           this.nextDir = [0, -1];
-          return this.game.update();
+          if (!this.game.inMotion) {
+            return this.game.update();
+          }
         }
       };
 
@@ -365,17 +375,42 @@
         this.score = this.turnCount = this.washCount = this.appleCount = 0;
         this.$cells = $('li');
         this.waterLevel = this.tankSize = 5;
+        this.frameRate = 500;
         this.life = new Life(this);
         this.snake = new Snake(this, 5);
+        this.inMotion = false;
+        $('h1').add('title').text("Snake on Fire");
+        this.startRunLoop();
         this.addApple();
         this.render();
       }
 
+      Game.prototype.startRunLoop = function() {
+        var startTime;
+        if (window.gameLoop != null) {
+          clearInterval(window.gameLoop);
+        }
+        startTime = Date.now();
+        return window.gameLoop = setInterval((function(_this) {
+          return function() {
+            if (!_this.inMotion) {
+              return;
+            }
+            _this.update();
+            console.log(_this.frameRate);
+            console.log((Date.now() - startTime) + 'ms elapsed');
+            return startTime = Date.now();
+          };
+        })(this), this.frameRate);
+      };
+
       Game.prototype.update = function() {
-        $("li").off("mouseenter");
+        if (!this.inMotion) {
+          $("li").off("mouseenter");
+        }
         this.turnCount += 1;
         this.boringTurnStreak += 1;
-        if (this.turnCount % 3 === 0) {
+        if (this.turnCount % 3 === 0 || this.inMotion) {
           this.waterLevel = _.min([this.waterLevel + 1, this.tankSize]);
         }
         this.life.update();
@@ -389,12 +424,24 @@
         return this.updateClass();
       };
 
+      Game.prototype.toggleMotion = function() {
+        this.inMotion = true;
+        return $('h1').add('title').text("Snake on Fire!");
+      };
+
       Game.prototype.updateScores = function() {
         if (this.turnCount) {
-          this.score += 1;
+          this.score += this.getTurnValue();
           $('.total-score .score').text(this.score);
           return $('.turn-count .score').text(this.turnCount);
         }
+      };
+
+      Game.prototype.getTurnValue = function() {
+        if (!this.inMotion) {
+          return 1;
+        }
+        return Math.floor(this.getAppleValue() / 50) + 4;
       };
 
       Game.prototype.renderWaterTank = function() {
@@ -418,11 +465,17 @@
         this.boringTurnStreak = this.appleCount;
         $find(this.apple).addClass("apple");
         if (this.appleCount) {
-          this.score += Math.pow(this.appleCount, 2) + 50;
+          this.score += this.getAppleValue();
           this.tankSize += 1;
+          this.frameRate *= 0.99;
           $('.apple-count .score').text(this.appleCount);
+          this.startRunLoop();
         }
         return this.appleCount += 1;
+      };
+
+      Game.prototype.getAppleValue = function() {
+        return Math.pow(this.appleCount, 2) + 50;
       };
 
       Game.prototype.updateClass = function() {
@@ -455,6 +508,7 @@
       };
 
       Game.prototype.gameOver = function() {
+        this.inMotion = false;
         $("html").off("mousedown").off("keydown");
         $('html').off("keyup.intro click.intro");
         showGameOverScreen();

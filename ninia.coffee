@@ -37,8 +37,7 @@ window.Program = do ->
     $modal = $('#modal')
     instructions = [
       "Press W-A-S-D or ↑ ← ↓ → to move",
-      "Don't let your #{spanify('head', 'snake')} run into the #{spanify('flames', 'fire')}",
-      "(Bumping into your #{spanify('body', 'snake')} isn't fatal, and edges are okay, you just wrap around)",
+      "Don't let your #{spanify('head', 'snake')} run into the #{spanify('flames', 'fire')} (bumping into your #{spanify('body', 'snake')} isn't fatal, and edges are okay, you just wrap around)",
       "Click and drag to douse #{spanify('flames', 'fire')}, but watch your #{spanify('water', 'water')} supply",
       "Have fun, eat #{spanify('apples', 'apple')}, and don't die!"
     ]
@@ -95,7 +94,7 @@ window.Program = do ->
   bindKeys = (game) ->
     $('html').on keydown:
       (event) ->
-        if event.keyCode in [37, 38, 39, 40, 65, 68, 83, 87]
+        if event.keyCode in [32, 37, 38, 39, 40, 65, 68, 83, 87]
           do event.preventDefault
 
         switch event.keyCode
@@ -103,6 +102,7 @@ window.Program = do ->
           when 37, 65 then do game.snake.west
           when 40, 83 then do game.snake.south
           when 39, 68 then do game.snake.east
+          when 32 then do game.toggleMotion
 
   $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
@@ -127,22 +127,22 @@ window.Program = do ->
     north: ->
       if @dir[0] isnt 1
         @nextDir = [-1, 0]
-        do @game.update
+        do @game.update unless @game.inMotion
 
     south: -> 
       if @dir[0] isnt -1
         @nextDir = [ 1, 0]
-        do @game.update
+        do @game.update unless @game.inMotion
 
     east: -> 
       if @dir[1] isnt -1
         @nextDir = [ 0, 1] 
-        do @game.update
+        do @game.update unless @game.inMotion
 
     west: -> 
       if @dir[1] isnt 1
         @nextDir = [ 0,-1] 
-        do @game.update
+        do @game.update unless @game.inMotion
 
     has: (coord) -> 
       (return true if coord.join() is part.join()) for part in @body
@@ -253,18 +253,37 @@ window.Program = do ->
       @score = @turnCount = @washCount = @appleCount = 0
       @$cells = $('li')
       @waterLevel = @tankSize = 5
+      @frameRate = 500
 
       @life = new Life(@)
       @snake = new Snake(@, 5)
 
+      @inMotion = false
+      $('h1').add('title').text("Snake on Fire")
+
+      @startRunLoop();
+
       do @addApple
       do @render
 
+    startRunLoop: ->
+      clearInterval(window.gameLoop) if window.gameLoop?
+
+      startTime = Date.now()
+      window.gameLoop = setInterval(=>
+        return unless @inMotion
+        do @update
+        console.log(@frameRate)
+        console.log((Date.now() - startTime) + 'ms elapsed')
+        startTime = Date.now()
+
+      , @frameRate)
+
     update: ->
-      $("li").off("mouseenter")
+      $("li").off("mouseenter") unless @inMotion
       @turnCount += 1
       @boringTurnStreak += 1
-      if @turnCount % 3 == 0
+      if @turnCount % 3 == 0 or @inMotion
         @waterLevel = _.min([@waterLevel + 1, @tankSize])
 
       do @life.update
@@ -276,11 +295,19 @@ window.Program = do ->
       do @renderWaterTank
       do @updateClass
 
+    toggleMotion: ->
+      @inMotion = true
+      $('h1').add('title').text("Snake on Fire!")
+
     updateScores: ->
       if @turnCount
-        @score += 1
+        @score += do @getTurnValue
         $('.total-score .score').text(@score)
         $('.turn-count .score').text(@turnCount)
+
+    getTurnValue: ->
+      return 1 unless @inMotion
+      Math.floor(do @getAppleValue / 50) + 4
 
     renderWaterTank: -> 
       percentageHeight = 1 - (@waterLevel / @tankSize)
@@ -304,11 +331,17 @@ window.Program = do ->
       $find(@apple).addClass("apple")
 
       if @appleCount
-        @score += (Math.pow(@appleCount, 2) + 50 )
+        @score += do @getAppleValue
         @tankSize += 1
+        @frameRate *= 0.99
         $('.apple-count .score').text(@appleCount)
 
+        @startRunLoop()
+
       @appleCount += 1
+
+    getAppleValue: ->
+      Math.pow(@appleCount, 2) + 50
 
     updateClass: ->
       @$cells.removeClass("water")
@@ -329,6 +362,7 @@ window.Program = do ->
             $(cell).addClass("super-hot")
 
     gameOver: ->
+      @inMotion = false
       $("html").off("mousedown").off("keydown")
       $('html').off("keyup.intro click.intro")
       do showGameOverScreen
