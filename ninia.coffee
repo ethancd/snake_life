@@ -94,7 +94,7 @@ window.Program = do ->
   bindKeys = (game) ->
     $('html').on keydown:
       (event) ->
-        if event.keyCode in [32, 37, 38, 39, 40, 65, 68, 83, 87]
+        if event.keyCode in [32, 37, 38, 39, 40, 65, 68, 83, 87, 191]
           do event.preventDefault
 
         switch event.keyCode
@@ -103,6 +103,7 @@ window.Program = do ->
           when 40, 83 then do game.snake.south
           when 39, 68 then do game.snake.east
           when 32 then do game.toggleMotion
+          when 191 then do game.toggleGuide
 
   $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
@@ -172,8 +173,9 @@ window.Program = do ->
         
       @game.life.list[@torch.join()] = "supertrue"
 
-      $find(@body[0]).removeClass("head")
-      $find(next).addClass("head")
+      isShiny = $find(@body[0]).hasClass("shiny");
+      $find(@body[0]).removeClass("head shiny")
+      $find(next).addClass("head").toggleClass("shiny", isShiny)
 
       @dir = @nextDir
       @body.unshift(next)
@@ -258,7 +260,7 @@ window.Program = do ->
       @life = new Life(@)
       @snake = new Snake(@, 5)
 
-      @inMotion = false
+      @recentGuiding = @recentStopping = @guide = @inMotion = false
       $('h1').add('title').text("Snake on Fire")
 
       @startRunLoop();
@@ -269,14 +271,9 @@ window.Program = do ->
     startRunLoop: ->
       clearInterval(window.gameLoop) if window.gameLoop?
 
-      startTime = Date.now()
       window.gameLoop = setInterval(=>
         return unless @inMotion
         do @update
-        console.log(@frameRate)
-        console.log((Date.now() - startTime) + 'ms elapsed')
-        startTime = Date.now()
-
       , @frameRate)
 
     update: ->
@@ -294,10 +291,29 @@ window.Program = do ->
       do @updateScores
       do @renderWaterTank
       do @updateClass
+      do @flamePreview
 
     toggleMotion: ->
-      @inMotion = true
-      $('h1').add('title').text("Snake on Fire!")
+      @inMotion = !@inMotion
+
+      if @inMotion 
+        title = "Snake on Fire!"
+        $find(@snake.body[0]).addClass("shiny") unless @recentStopping
+      else
+        title = "Snake on Fire"
+        @recentStopping = true
+        $find(@snake.body[0]).removeClass("shiny")
+
+      $('h1').add('title').text(title)
+
+    toggleGuide: ->
+      @guide = !@guide
+      if @guide 
+        do @flamePreview 
+        @recentGuiding = true
+        $find(@apple).addClass("dull")
+      else 
+        do @updateClass
 
     updateScores: ->
       if @turnCount
@@ -306,7 +322,7 @@ window.Program = do ->
         $('.turn-count .score').text(@turnCount)
 
     getTurnValue: ->
-      return 1 unless @inMotion
+      return 1 unless @inMotion and not @recentStopping
       Math.floor(do @getAppleValue / 50) + 4
 
     renderWaterTank: -> 
@@ -336,18 +352,20 @@ window.Program = do ->
         @frameRate *= 0.99
         $('.apple-count .score').text(@appleCount)
 
+        @recentStopping = false
+        @recentGuiding = @guide
+
+        $find(@snake.body[0]).addClass("shiny") if @inMotion
+        $find(@apple).addClass("dull") if @recentGuiding
         @startRunLoop()
 
       @appleCount += 1
 
     getAppleValue: ->
-      Math.pow(@appleCount, 2) + 50
+      if @recentGuiding then @appleCount + 50 else Math.pow(@appleCount, 2) + 50
 
     updateClass: ->
-      @$cells.removeClass("water")
-      @$cells.removeClass("snake")
-      @$cells.removeClass("living")
-      @$cells.removeClass("super-hot")
+      @$cells.removeClass("water snake pre-living pre-dying living super-hot")
 
       for cell in @$cells
         cellArr = cell.id.split("-")
@@ -361,6 +379,18 @@ window.Program = do ->
           if @life.has(coord) is "supertrue"
             $(cell).addClass("super-hot")
 
+    flamePreview: ->
+      return unless @guide
+      @$cells.removeClass("pre-living")
+      futureFlames = do @life.detectionSweep
+      for cell in @$cells
+        cellArr = cell.id.split("-")
+        coord = [parseInt(cellArr[1]), parseInt(cellArr[3])]
+        if futureFlames[coord.join()]
+          $(cell).addClass("pre-living")
+        else if @life.has(coord)
+          $(cell).addClass("pre-dying")
+
     gameOver: ->
       @inMotion = false
       $("html").off("mousedown").off("keydown")
@@ -369,18 +399,22 @@ window.Program = do ->
       window.game = null
      
     wash: (event) ->
-      return unless @waterLevel
       node = event.target
       cell = @getId(node)
 
-      if @life.has(cell)
-        @kill(node, cell)
-        @waterLevel -= 1
-        @washCount += 1
-        @score += 10
-        $('.flame-count .score').text(@washCount)
-        $('.total-score .score').text(@score)
-        do @renderWaterTank
+      return unless @waterLevel and @life.has(cell)
+
+      @kill(node, cell)
+
+      @waterLevel -= 1
+      @washCount += 1
+      @score += 10
+
+      $('.flame-count .score').text(@washCount)
+      $('.total-score .score').text(@score)
+
+      do @renderWaterTank
+      do @flamePreview unless @inMotion
         
     kill: (node, cell) ->
       if @life.has(cell)

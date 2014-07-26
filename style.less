@@ -67,7 +67,7 @@
           border-radius: @tile-size / 6;
         }
 
-        &.living.super-hot {
+        &.living.super-hot, &.pre-living {
           width: @tile-size - 2px;
           height: @tile-size - 2px;
         }
@@ -332,6 +332,12 @@ h2 {
       @keyframes apple {.pulse(@gold, lighten(@gold, 10%), #fff);}
       .loop-animation(apple);
     }
+
+    &.dull {
+      .none-animation;
+      background-color: darken(@gold, 20%);
+      box-shadow: 0 0 8px @gold;
+    }
   }
 
   .snake {
@@ -342,11 +348,30 @@ h2 {
     background-color: darken(@snake, 10%);
     border-radius: 5px;
     box-shadow: 0 0 2px @snake;
+
+    &.shiny {
+      background-color: #83F52C;
+      box-shadow: 0 0 8px #83F52C;
+    }
+
+    &.living {
+      background-color: @fire;
+    }
+  }
+
+  .pre-living {
+    border: 1px solid @fire;
+    width: 28px;
+    height: 28px;
   }
 
   .living {
     background-color: @fire;
     border-radius: 5px;
+
+    &.pre-dying {
+      opacity: 0.5;
+    }
 
     &.super-hot {
       border: 1px solid @violet;

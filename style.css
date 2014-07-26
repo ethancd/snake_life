@@ -256,6 +256,12 @@ h2 {
     box-shadow: 0 0 4px #ffffff;
   }
 }
+#board .apple.dull {
+  -webkit-animation-name: none;
+  animation-name: none;
+  background-color: #998100;
+  box-shadow: 0 0 8px #ffd700;
+}
 #board .snake {
   background-color: #00b800;
 }
@@ -264,9 +270,24 @@ h2 {
   border-radius: 5px;
   box-shadow: 0 0 2px #00b800;
 }
+#board .head.shiny {
+  background-color: #83F52C;
+  box-shadow: 0 0 8px #83F52C;
+}
+#board .head.living {
+  background-color: #ff0000;
+}
+#board .pre-living {
+  border: 1px solid #ff0000;
+  width: 28px;
+  height: 28px;
+}
 #board .living {
   background-color: #ff0000;
   border-radius: 5px;
+}
+#board .living.pre-dying {
+  opacity: 0.5;
 }
 #board .living.super-hot {
   border: 1px solid #993cf3;
@@ -365,7 +386,8 @@ h2 {
   #board li.water {
     border-radius: 0.66666667px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 2px;
     height: 2px;
   }
@@ -420,7 +442,8 @@ h2 {
   #board li.water {
     border-radius: 1.33333333px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 6px;
     height: 6px;
   }
@@ -475,7 +498,8 @@ h2 {
   #board li.water {
     border-radius: 2px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 10px;
     height: 10px;
   }
@@ -530,7 +554,8 @@ h2 {
   #board li.water {
     border-radius: 2.66666667px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 14px;
     height: 14px;
   }
@@ -585,7 +610,8 @@ h2 {
   #board li.water {
     border-radius: 3.33333333px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 18px;
     height: 18px;
   }
@@ -640,7 +666,8 @@ h2 {
   #board li.water {
     border-radius: 4px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 22px;
     height: 22px;
   }
@@ -695,7 +722,8 @@ h2 {
   #board li.water {
     border-radius: 4.66666667px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 26px;
     height: 26px;
   }
@@ -750,7 +778,8 @@ h2 {
   #board li.water {
     border-radius: 5.33333333px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 30px;
     height: 30px;
   }
@@ -805,7 +834,8 @@ h2 {
   #board li.water {
     border-radius: 6px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 34px;
     height: 34px;
   }
@@ -860,7 +890,8 @@ h2 {
   #board li.water {
     border-radius: 6.66666667px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 38px;
     height: 38px;
   }
@@ -915,7 +946,8 @@ h2 {
   #board li.water {
     border-radius: 7.33333333px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 42px;
     height: 42px;
   }
@@ -970,7 +1002,8 @@ h2 {
   #board li.water {
     border-radius: 8px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 46px;
     height: 46px;
   }
@@ -1025,7 +1058,8 @@ h2 {
   #board li.water {
     border-radius: 8.66666667px;
   }
-  #board li.living.super-hot {
+  #board li.living.super-hot,
+  #board li.pre-living {
     width: 50px;
     height: 50px;
   }

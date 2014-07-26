@@ -127,7 +127,7 @@
       return $('html').on({
         keydown: function(event) {
           var _ref;
-          if ((_ref = event.keyCode) === 32 || _ref === 37 || _ref === 38 || _ref === 39 || _ref === 40 || _ref === 65 || _ref === 68 || _ref === 83 || _ref === 87) {
+          if ((_ref = event.keyCode) === 32 || _ref === 37 || _ref === 38 || _ref === 39 || _ref === 40 || _ref === 65 || _ref === 68 || _ref === 83 || _ref === 87 || _ref === 191) {
             event.preventDefault();
           }
           switch (event.keyCode) {
@@ -145,6 +145,8 @@
               return game.snake.east();
             case 32:
               return game.toggleMotion();
+            case 191:
+              return game.toggleGuide();
           }
         }
       });
@@ -231,7 +233,7 @@
       };
 
       Snake.prototype.update = function() {
-        var next;
+        var isShiny, next;
         next = this.getNext();
         if (this.has(next)) {
           if (!window.invincible && this.game.life.has(this.body[0])) {
@@ -250,8 +252,9 @@
           this.torch = this.body.pop();
         }
         this.game.life.list[this.torch.join()] = "supertrue";
-        $find(this.body[0]).removeClass("head");
-        $find(next).addClass("head");
+        isShiny = $find(this.body[0]).hasClass("shiny");
+        $find(this.body[0]).removeClass("head shiny");
+        $find(next).addClass("head").toggleClass("shiny", isShiny);
         this.dir = this.nextDir;
         return this.body.unshift(next);
       };
@@ -378,7 +381,7 @@
         this.frameRate = 500;
         this.life = new Life(this);
         this.snake = new Snake(this, 5);
-        this.inMotion = false;
+        this.recentGuiding = this.recentStopping = this.guide = this.inMotion = false;
         $('h1').add('title').text("Snake on Fire");
         this.startRunLoop();
         this.addApple();
@@ -386,20 +389,15 @@
       }
 
       Game.prototype.startRunLoop = function() {
-        var startTime;
         if (window.gameLoop != null) {
           clearInterval(window.gameLoop);
         }
-        startTime = Date.now();
         return window.gameLoop = setInterval((function(_this) {
           return function() {
             if (!_this.inMotion) {
               return;
             }
-            _this.update();
-            console.log(_this.frameRate);
-            console.log((Date.now() - startTime) + 'ms elapsed');
-            return startTime = Date.now();
+            return _this.update();
           };
         })(this), this.frameRate);
       };
@@ -421,12 +419,35 @@
       Game.prototype.render = function() {
         this.updateScores();
         this.renderWaterTank();
-        return this.updateClass();
+        this.updateClass();
+        return this.flamePreview();
       };
 
       Game.prototype.toggleMotion = function() {
-        this.inMotion = true;
-        return $('h1').add('title').text("Snake on Fire!");
+        var title;
+        this.inMotion = !this.inMotion;
+        if (this.inMotion) {
+          title = "Snake on Fire!";
+          if (!this.recentStopping) {
+            $find(this.snake.body[0]).addClass("shiny");
+          }
+        } else {
+          title = "Snake on Fire";
+          this.recentStopping = true;
+          $find(this.snake.body[0]).removeClass("shiny");
+        }
+        return $('h1').add('title').text(title);
+      };
+
+      Game.prototype.toggleGuide = function() {
+        this.guide = !this.guide;
+        if (this.guide) {
+          this.flamePreview();
+          this.recentGuiding = true;
+          return $find(this.apple).addClass("dull");
+        } else {
+          return this.updateClass();
+        }
       };
 
       Game.prototype.updateScores = function() {
@@ -438,7 +459,7 @@
       };
 
       Game.prototype.getTurnValue = function() {
-        if (!this.inMotion) {
+        if (!(this.inMotion && !this.recentStopping)) {
           return 1;
         }
         return Math.floor(this.getAppleValue() / 50) + 4;
@@ -469,21 +490,30 @@
           this.tankSize += 1;
           this.frameRate *= 0.99;
           $('.apple-count .score').text(this.appleCount);
+          this.recentStopping = false;
+          this.recentGuiding = this.guide;
+          if (this.inMotion) {
+            $find(this.snake.body[0]).addClass("shiny");
+          }
+          if (this.recentGuiding) {
+            $find(this.apple).addClass("dull");
+          }
           this.startRunLoop();
         }
         return this.appleCount += 1;
       };
 
       Game.prototype.getAppleValue = function() {
-        return Math.pow(this.appleCount, 2) + 50;
+        if (this.recentGuiding) {
+          return this.appleCount + 50;
+        } else {
+          return Math.pow(this.appleCount, 2) + 50;
+        }
       };
 
       Game.prototype.updateClass = function() {
         var cell, cellArr, coord, _i, _len, _ref, _results;
-        this.$cells.removeClass("water");
-        this.$cells.removeClass("snake");
-        this.$cells.removeClass("living");
-        this.$cells.removeClass("super-hot");
+        this.$cells.removeClass("water snake pre-living pre-dying living super-hot");
         _ref = this.$cells;
         _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -507,6 +537,30 @@
         return _results;
       };
 
+      Game.prototype.flamePreview = function() {
+        var cell, cellArr, coord, futureFlames, _i, _len, _ref, _results;
+        if (!this.guide) {
+          return;
+        }
+        this.$cells.removeClass("pre-living");
+        futureFlames = this.life.detectionSweep();
+        _ref = this.$cells;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          cell = _ref[_i];
+          cellArr = cell.id.split("-");
+          coord = [parseInt(cellArr[1]), parseInt(cellArr[3])];
+          if (futureFlames[coord.join()]) {
+            _results.push($(cell).addClass("pre-living"));
+          } else if (this.life.has(coord)) {
+            _results.push($(cell).addClass("pre-dying"));
+          } else {
+            _results.push(void 0);
+          }
+        }
+        return _results;
+      };
+
       Game.prototype.gameOver = function() {
         this.inMotion = false;
         $("html").off("mousedown").off("keydown");
@@ -517,19 +571,20 @@
 
       Game.prototype.wash = function(event) {
         var cell, node;
-        if (!this.waterLevel) {
-          return;
-        }
         node = event.target;
         cell = this.getId(node);
-        if (this.life.has(cell)) {
-          this.kill(node, cell);
-          this.waterLevel -= 1;
-          this.washCount += 1;
-          this.score += 10;
-          $('.flame-count .score').text(this.washCount);
-          $('.total-score .score').text(this.score);
-          return this.renderWaterTank();
+        if (!(this.waterLevel && this.life.has(cell))) {
+          return;
+        }
+        this.kill(node, cell);
+        this.waterLevel -= 1;
+        this.washCount += 1;
+        this.score += 10;
+        $('.flame-count .score').text(this.washCount);
+        $('.total-score .score').text(this.score);
+        this.renderWaterTank();
+        if (!this.inMotion) {
+          return this.flamePreview();
         }
       };
 
