@@ -126,24 +126,26 @@ window.Program = do ->
       @game.life.list[@torch.join()] = "supertrue"
 
     north: ->
-      if @dir[0] isnt 1
-        @nextDir = [-1, 0]
-        do @game.update unless @game.inMotion
+      @move([-1, 0]) if @dir[0] isnt 1
+        
 
     south: -> 
-      if @dir[0] isnt -1
-        @nextDir = [ 1, 0]
-        do @game.update unless @game.inMotion
-
+      @move([1, 0]) if @dir[0] isnt -1
+        
     east: -> 
-      if @dir[1] isnt -1
-        @nextDir = [ 0, 1] 
-        do @game.update unless @game.inMotion
+      @move([0, 1]) if @dir[1] isnt -1
 
     west: -> 
-      if @dir[1] isnt 1
-        @nextDir = [ 0,-1] 
-        do @game.update unless @game.inMotion
+      @move([0, -1]) if @dir[1] isnt 1
+
+    move: (targetDir) ->
+      sameDirection = @nextDir.join() is targetDir.join()
+      @nextDir = targetDir
+
+      if @game.inMotion
+        do @game.jumpToUpdate if sameDirection
+      else
+        do @game.update
 
     has: (coord) -> 
       (return true if coord.join() is part.join()) for part in @body
@@ -263,18 +265,22 @@ window.Program = do ->
       @recentGuiding = @recentStopping = @guide = @inMotion = false
       $('h1').add('title').text("Snake on Fire")
 
-      @startRunLoop();
-
       do @addApple
       do @render
 
-    startRunLoop: ->
-      clearInterval(window.gameLoop) if window.gameLoop?
-
-      window.gameLoop = setInterval(=>
-        return unless @inMotion
-        do @update
+    runLoop: ->
+      window.pendingUpdate = setTimeout(=>
+        do @innerLoop
       , @frameRate)
+
+    jumpToUpdate: ->
+      window.clearTimeout(window.pendingUpdate)
+      do @innerLoop
+
+    innerLoop: ->
+      return unless @inMotion
+      do @update
+      do @runLoop
 
     update: ->
       $("li").off("mouseenter") unless @inMotion
@@ -299,6 +305,7 @@ window.Program = do ->
       if @inMotion 
         title = "Snake on Fire!"
         $find(@snake.body[0]).addClass("shiny") unless @recentStopping
+        do @runLoop
       else
         title = "Snake on Fire"
         @recentStopping = true
@@ -357,7 +364,6 @@ window.Program = do ->
 
         $find(@snake.body[0]).addClass("shiny") if @inMotion
         $find(@apple).addClass("dull") if @recentGuiding
-        @startRunLoop()
 
       @appleCount += 1
 

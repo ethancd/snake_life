@@ -182,37 +182,38 @@
 
       Snake.prototype.north = function() {
         if (this.dir[0] !== 1) {
-          this.nextDir = [-1, 0];
-          if (!this.game.inMotion) {
-            return this.game.update();
-          }
+          return this.move([-1, 0]);
         }
       };
 
       Snake.prototype.south = function() {
         if (this.dir[0] !== -1) {
-          this.nextDir = [1, 0];
-          if (!this.game.inMotion) {
-            return this.game.update();
-          }
+          return this.move([1, 0]);
         }
       };
 
       Snake.prototype.east = function() {
         if (this.dir[1] !== -1) {
-          this.nextDir = [0, 1];
-          if (!this.game.inMotion) {
-            return this.game.update();
-          }
+          return this.move([0, 1]);
         }
       };
 
       Snake.prototype.west = function() {
         if (this.dir[1] !== 1) {
-          this.nextDir = [0, -1];
-          if (!this.game.inMotion) {
-            return this.game.update();
+          return this.move([0, -1]);
+        }
+      };
+
+      Snake.prototype.move = function(targetDir) {
+        var sameDirection;
+        sameDirection = this.nextDir.join() === targetDir.join();
+        this.nextDir = targetDir;
+        if (this.game.inMotion) {
+          if (sameDirection) {
+            return this.game.jumpToUpdate();
           }
+        } else {
+          return this.game.update();
         }
       };
 
@@ -383,23 +384,29 @@
         this.snake = new Snake(this, 5);
         this.recentGuiding = this.recentStopping = this.guide = this.inMotion = false;
         $('h1').add('title').text("Snake on Fire");
-        this.startRunLoop();
         this.addApple();
         this.render();
       }
 
-      Game.prototype.startRunLoop = function() {
-        if (window.gameLoop != null) {
-          clearInterval(window.gameLoop);
-        }
-        return window.gameLoop = setInterval((function(_this) {
+      Game.prototype.runLoop = function() {
+        return window.pendingUpdate = setTimeout((function(_this) {
           return function() {
-            if (!_this.inMotion) {
-              return;
-            }
-            return _this.update();
+            return _this.innerLoop();
           };
         })(this), this.frameRate);
+      };
+
+      Game.prototype.jumpToUpdate = function() {
+        window.clearTimeout(window.pendingUpdate);
+        return this.innerLoop();
+      };
+
+      Game.prototype.innerLoop = function() {
+        if (!this.inMotion) {
+          return;
+        }
+        this.update();
+        return this.runLoop();
       };
 
       Game.prototype.update = function() {
@@ -431,6 +438,7 @@
           if (!this.recentStopping) {
             $find(this.snake.body[0]).addClass("shiny");
           }
+          this.runLoop();
         } else {
           title = "Snake on Fire";
           this.recentStopping = true;
@@ -498,7 +506,6 @@
           if (this.recentGuiding) {
             $find(this.apple).addClass("dull");
           }
-          this.startRunLoop();
         }
         return this.appleCount += 1;
       };
