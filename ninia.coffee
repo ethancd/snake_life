@@ -9,6 +9,8 @@ window.Program = do ->
 
     bindMouse(game)
     bindKeys(game)
+    bindCheckboxes(game)
+
     if window.returningPlayer
       $('#modal').hide()
       $('#new-game').hide()
@@ -104,6 +106,10 @@ window.Program = do ->
           when 39, 68 then do game.snake.east
           when 32 then do game.toggleMotion
           when 191 then do game.toggleGuide
+
+  bindCheckboxes = (game) ->
+    $('#motion').change(game.toggleMotion.bind(game))
+    $('#guide').change(game.toggleGuide.bind(game))
 
   $find = (coord) -> $("#row-#{coord[0]}-col-#{coord[1]}")
 
@@ -262,11 +268,14 @@ window.Program = do ->
       @life = new Life(@)
       @snake = new Snake(@, 5)
 
-      @recentGuiding = @recentStopping = @guide = @inMotion = false
+      @recentGuiding = @guide = $('#guide').prop('checked')
+      @inMotion = $('#motion').prop('checked')
+      @recentStopping = !@inMotion
       $('h1').add('title').text("Snake on Fire")
 
       do @addApple
       do @render
+      do @runLoop if @inMotion
 
     runLoop: ->
       window.pendingUpdate = setTimeout(=>
@@ -301,6 +310,7 @@ window.Program = do ->
 
     toggleMotion: ->
       @inMotion = !@inMotion
+      $('#motion').prop('checked', @inMotion)
 
       if @inMotion 
         title = "Snake on Fire!"
@@ -315,6 +325,8 @@ window.Program = do ->
 
     toggleGuide: ->
       @guide = !@guide
+      $('#guide').prop('checked', @guide)
+
       if @guide 
         do @flamePreview 
         @recentGuiding = true
@@ -401,6 +413,7 @@ window.Program = do ->
       @inMotion = false
       $("html").off("mousedown").off("keydown")
       $('html').off("keyup.intro click.intro")
+      $('input[type="checkbox"]').off('change')
       do showGameOverScreen
       window.game = null
      

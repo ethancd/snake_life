@@ -9,6 +9,7 @@ article,
 section,
 button,
 input,
+label,
 form,
 span,
 h1,
@@ -57,6 +58,9 @@ h1 {
 }
 h2 {
   font-size: 24px;
+}
+label {
+  display: block;
 }
 .counts {
   position: absolute;
